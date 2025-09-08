@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/authservice/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/driverservice/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/locationservice/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/paymentservice/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ratingservice/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rideservice/src/main/java" charset="UTF-8" />
