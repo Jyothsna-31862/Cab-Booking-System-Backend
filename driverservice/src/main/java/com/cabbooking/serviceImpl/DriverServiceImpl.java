@@ -3,6 +3,7 @@ package com.cabbooking.serviceImpl;
 import com.cabbooking.dto.DriverDto;
 import com.cabbooking.dto.DriverRequest;
 import com.cabbooking.dto.DriverServiceResponse;
+import com.cabbooking.exception.DriverNotFoundException;
 import com.cabbooking.exception.EmailAlreadyExistsException;
 import com.cabbooking.exception.PhoneAlreadyExistsException;
 import com.cabbooking.repository.DriverRepository;
@@ -49,5 +50,20 @@ public class DriverServiceImpl implements DriverService {
         driverResponse.setMessage("Driver Registered Successfully");
         return driverResponse;
 
+    }
+
+    @Override
+    public DriverServiceResponse getDriverById(String id) throws DriverNotFoundException {
+
+        
+        Driver driver = driverRepository.findByDriverId(id)
+                .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
+        DriverDto driverDto = modelMapper.map(driver, DriverDto.class);
+        DriverServiceResponse driverServiceResponse = new DriverServiceResponse();
+        driverServiceResponse.setBody(driverDto);
+        driverServiceResponse.setStatus("success");
+        driverServiceResponse.setMessage("Driver fetched successfully");
+
+        return driverServiceResponse;
     }
 }
