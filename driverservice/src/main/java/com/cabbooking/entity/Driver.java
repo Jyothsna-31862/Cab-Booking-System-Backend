@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "drivers")
@@ -16,8 +17,8 @@ import java.sql.Timestamp;
 public class Driver {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long driverId;
+    @Column(name = "driver_id", columnDefinition = "CHAR(36)")
+    private String driverId=UUID.randomUUID().toString();
 
     @Column(unique = true, nullable = false)
     private String phone;

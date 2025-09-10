@@ -3,7 +3,7 @@ package com.cabbooking.dto;
 import lombok.Data;
 
 @Data
-public class DriverRegistrationRequest {
+public class DriverRequest {
     private String fullName;
     private String email;
     private String phone;
@@ -13,4 +13,6 @@ public class DriverRegistrationRequest {
     private String vehicleNumber;
     private String vehicleName;
     private int carSeater;
+    
+
 }
