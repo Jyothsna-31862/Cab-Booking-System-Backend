@@ -3,16 +3,18 @@ package com.cabbooking.userservice.service;
 import com.cabbooking.userservice.config.MapperConfig;
 import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
-import com.cabbooking.userservice.dto.UserResponse;
+import com.cabbooking.userservice.dto.UserServiceResponse;
 import com.cabbooking.userservice.exception.EmailAlreadyExistsException;
 import com.cabbooking.userservice.exception.PhoneAlreadyExistsException;
+import com.cabbooking.userservice.exception.UserNotFoundException;
 import com.cabbooking.userservice.model.User;
 import com.cabbooking.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -25,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserResponse registerUser(UserRequest userRequest) {
+    public UserServiceResponse registerUser(UserRequest userRequest) {
 
 
         log.info("UserService class invoked");
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto=modelMapper.map(savedUser, UserDto.class);
 
-        UserResponse userResponse=new UserResponse();
+        UserServiceResponse userResponse=new UserServiceResponse();
 
         userResponse.setBody(userDto);
         userResponse.setStatus("success");
@@ -60,4 +62,23 @@ public class UserServiceImpl implements UserService {
         return userResponse;
 
     }
+
+    @Override
+    public UserServiceResponse getUserById(String id) throws UserNotFoundException {
+
+        User user = (User) userRepository.findByUserId(id)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
+
+        UserDto userDto=modelMapper.map(user,UserDto.class);
+
+
+        UserServiceResponse userServiceResponse= new UserServiceResponse();
+
+        userServiceResponse.setBody(userDto);
+        userServiceResponse.setStatus("success");
+        userServiceResponse.setMessage("User fetched successfully");
+
+        return userServiceResponse;
+    }
+
 }
