@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserServiceResponse getUserById(String id) throws UserNotFoundException {
+    public UserDto getUserById(String id) throws UserNotFoundException {
 
         User user = (User) userRepository.findByUserId(id)
                 .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
@@ -72,13 +72,8 @@ public class UserServiceImpl implements UserService {
         UserDto userDto=modelMapper.map(user,UserDto.class);
 
 
-        UserServiceResponse userServiceResponse= new UserServiceResponse();
 
-        userServiceResponse.setBody(userDto);
-        userServiceResponse.setStatus("success");
-        userServiceResponse.setMessage("User fetched successfully");
-
-        return userServiceResponse;
+        return userDto;
     }
 
 }

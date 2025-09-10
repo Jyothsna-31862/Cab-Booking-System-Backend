@@ -1,5 +1,6 @@
 package com.cabbooking.userservice.controller;
 
+import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
 import com.cabbooking.userservice.dto.UserServiceResponse;
 import com.cabbooking.userservice.exception.UserNotFoundException;
@@ -32,9 +33,9 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserServiceResponse> getUserById(@PathVariable("id") String id) throws UserNotFoundException {
+    public ResponseEntity<UserDto> getUserById(@PathVariable("id") String id) throws UserNotFoundException {
 
-        UserServiceResponse userById = userService.getUserById(id);
+        UserDto userById = userService.getUserById(id);
         return new ResponseEntity<>(userById, HttpStatus.OK);
 
     }
