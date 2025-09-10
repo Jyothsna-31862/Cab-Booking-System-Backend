@@ -1,6 +1,8 @@
 package com.cabbooking.controller;
+import com.cabbooking.dto.DriverDto;
 import com.cabbooking.dto.DriverRequest;
 import com.cabbooking.dto.DriverServiceResponse;
+import com.cabbooking.exception.DriverNotFoundException;
 import com.cabbooking.service.DriverService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,15 @@ import org.springframework.web.bind.annotation.*;
 public class DriverController {
 
     private final DriverService driverService;
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DriverDto> getUserById(@PathVariable("id") String id) throws DriverNotFoundException {
+
+        DriverDto DriverById = driverService.getDriverById(id);
+        return new ResponseEntity<>(DriverById, HttpStatus.OK);
+
+    }
 
     @PostMapping("/register")
     public ResponseEntity<DriverServiceResponse> registerDriver(@RequestBody DriverRequest driver) {

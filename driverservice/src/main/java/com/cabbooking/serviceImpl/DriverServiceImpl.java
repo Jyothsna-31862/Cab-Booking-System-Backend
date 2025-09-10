@@ -53,17 +53,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverServiceResponse getDriverById(String id) throws DriverNotFoundException {
+    public DriverDto getDriverById(String id) throws DriverNotFoundException {
 
         
-        Driver driver = driverRepository.findByDriverId(id)
+        Object driver = driverRepository.findByDriverId(id)
                 .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
         DriverDto driverDto = modelMapper.map(driver, DriverDto.class);
-        DriverServiceResponse driverServiceResponse = new DriverServiceResponse();
-        driverServiceResponse.setBody(driverDto);
-        driverServiceResponse.setStatus("success");
-        driverServiceResponse.setMessage("Driver fetched successfully");
-
-        return driverServiceResponse;
+        return driverDto;
     }
 }
