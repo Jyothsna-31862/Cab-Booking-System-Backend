@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface LocationService {
     List<LocationDto> getLocations();
+    LocationDto getLocationByArea(String area);
 }

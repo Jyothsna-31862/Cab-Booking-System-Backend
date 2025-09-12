@@ -1,15 +1,19 @@
 package com.cabbooking.locationservice.service;
 
 import com.cabbooking.locationservice.dto.LocationDto;
+import com.cabbooking.locationservice.exception.LocationServiceException;
+import com.cabbooking.locationservice.model.Location;
 import com.cabbooking.locationservice.repository.LocationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
-public class LocationServiceImp implements LocationService{
+public class LocationServiceImp implements LocationService {
 
     private final LocationRepository locationRepository;
     private final ModelMapper modelMapper;
@@ -21,11 +25,28 @@ public class LocationServiceImp implements LocationService{
 
     @Override
     public List<LocationDto> getLocations() {
-        return locationRepository.findAll()
-                .stream()
+        log.info("Fetching all locations from the repository");
+        try {
+            List<LocationDto> locationDtos = locationRepository.findAll()
+                    .stream()
+                    .map(location -> modelMapper.map(location, LocationDto.class))
+                    .collect(Collectors.toList());
+            log.debug("Successfully mapped {} locations to DTOs", locationDtos.size());
+            return locationDtos;
+        } catch (Exception e) {
+            log.error("Error occurred while retrieving locations", e);
+            throw new LocationServiceException("Error retrieving location data");
+        }
+    }
 
-                .map(location -> modelMapper.map(location, LocationDto.class))
-                .collect(Collectors.toList());
+    @Override
+    public LocationDto getLocationByArea(String area) {
+        log.info("Fetching location for area: {}", area);
+        Location location = locationRepository.findByArea(area)
+                .orElseThrow(() -> new LocationServiceException("Location not found for area: " + area));
+        LocationDto locationDto = modelMapper.map(location, LocationDto.class);
+        log.debug("Successfully mapped location '{}' to DTO", area);
+        return locationDto;
     }
 
 }

@@ -37,5 +37,4 @@ public class Location {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    private LocalDateTime deletedAt;
 }
