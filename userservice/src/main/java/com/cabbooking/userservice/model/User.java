@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+;
 
 @Entity
 @Table(name = "user")
@@ -19,8 +20,9 @@ import java.util.UUID;
 public class User {
 
     @Id
+    @UuidGenerator
     @Column(name = "user_id", columnDefinition = "CHAR(36)")
-    private String userId = UUID.randomUUID().toString();
+    private String userId;
 
     @Column(name = "full_name", length = 255)
     private String fullName;

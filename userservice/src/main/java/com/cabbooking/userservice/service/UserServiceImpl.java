@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -25,55 +24,46 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final MapperConfig mapperConfig;
 
-
     @Override
     public UserServiceResponse registerUser(UserRequest userRequest) {
-
-
-        log.info("UserService class invoked");
+        log.info("Registering user with email: {}", userRequest.getEmail());
 
         if (userRepository.existsByEmail(userRequest.getEmail())) {
+            log.warn("Email already registered: {}", userRequest.getEmail());
             throw new EmailAlreadyExistsException("Given Email Already Registered: " + userRequest.getEmail());
         }
 
         if (userRepository.existsByPhone(userRequest.getPhone())) {
+            log.warn("Phone number already registered: {}", userRequest.getPhone());
             throw new PhoneAlreadyExistsException("Given Phone number already registered: " + userRequest.getPhone());
         }
 
-        User user;
-        user = modelMapper.map(userRequest, User.class);
-
-
+        User user = modelMapper.map(userRequest, User.class);
         user.setCode(mapperConfig.generateCode());
         User savedUser = userRepository.save(user);
 
+        log.info("User registered successfully with ID: {}", savedUser.getUserId());
 
-
-        log.info("User Saved Successfully");
-
-        UserDto userDto=modelMapper.map(savedUser, UserDto.class);
-
-        UserServiceResponse userResponse=new UserServiceResponse();
-
+        UserDto userDto = modelMapper.map(savedUser, UserDto.class);
+        UserServiceResponse userResponse = new UserServiceResponse();
         userResponse.setBody(userDto);
         userResponse.setStatus("success");
         userResponse.setMessage("User Registered Successfully");
 
         return userResponse;
-
     }
 
     @Override
     public UserDto getUserById(String id) throws UserNotFoundException {
+        log.info("Fetching user with ID: {}", id);
 
-        User user = (User) userRepository.findByUserId(id)
-                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
+        User user = userRepository.findByUserId(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new UserNotFoundException("User with ID " + id + " not found");
+                });
 
-        UserDto userDto=modelMapper.map(user,UserDto.class);
-
-
-
-        return userDto;
+        return modelMapper.map(user, UserDto.class);
     }
-
 }
+
