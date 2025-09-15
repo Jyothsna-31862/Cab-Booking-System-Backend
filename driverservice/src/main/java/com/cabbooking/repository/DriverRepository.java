@@ -2,6 +2,9 @@ package com.cabbooking.repository;
 
 import com.cabbooking.entity.Driver;
 
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +17,9 @@ public interface DriverRepository extends JpaRepository<Driver, String> {
     boolean existsByPhone(String phone);
 
     Optional<Driver> findByDriverId(String id);
- }
+    Optional<Driver> findByEmail(String email);
+    boolean existsByDriverId(String driverId);
+    @Query("SELECT d FROM Driver d WHERE d.isAvailable = true AND d.carSeater = :carSr")
+    Optional<Driver> findAvailableDriverWithCarSeater(@Param("carSr") String carSr);
+
+}
