@@ -44,4 +44,17 @@ public class UserController {
         UserDto userByEmail = userService.getUserByEmail(email);
         return new ResponseEntity<>(userByEmail, HttpStatus.OK);
     }
+
+// Add this method inside UserController
+
+    @Operation(summary = "Update user by ID")
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UserServiceResponse> updateUser(
+            @PathVariable("id") String id,
+            @RequestBody UserRequest userRequest) throws UserNotFoundException {
+        log.info("Update request for user {}: {}", id, userRequest);
+        UserServiceResponse updatedUser = userService.updateUser(id, userRequest);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
 }

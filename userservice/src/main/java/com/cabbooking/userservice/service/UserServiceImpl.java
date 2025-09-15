@@ -78,5 +78,35 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(user, UserDto.class);
     }
+
+    @Override
+    public UserServiceResponse updateUser(String id, UserRequest updateRequest) throws UserNotFoundException {
+        User user = userRepository.findByUserId(id)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", id);
+                    return new UserNotFoundException("User with ID " + id + " not found");
+                });
+
+        Integer code=user.getCode();
+        String email= user.getEmail();
+
+        user.setFullName(updateRequest.getFullName());
+        user.setEmail(email);
+        user.setPhone(updateRequest.getPhone());
+        user.setGender(updateRequest.getGender());
+        user.setCode(code);
+
+
+
+        userRepository.save(user);
+
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        UserServiceResponse userResponse = new UserServiceResponse();
+        userResponse.setBody(userDto);
+        userResponse.setStatus("success");
+        userResponse.setMessage("User Updated Successfully");
+        return userResponse;
+    }
+
 }
 
