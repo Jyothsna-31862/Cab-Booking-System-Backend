@@ -9,6 +9,7 @@ import com.cabbooking.authservice.security.JwtTokenProvider;
 import com.cabbooking.authservice.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserClient userClient;
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -39,6 +41,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             JwtResponse jwtResponse = new JwtResponse();
             User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
+            log.info("User found: {}", user);
+            UserDto userDto = userClient.getUserByEmail(user.getEmail()).getBody();
+
+            jwtResponse.setUser(userDto);
             jwtResponse.setAccessToken(jwtTokenProvider.generateToken(authentication));
             jwtResponse.setRole(user.getRole());
             jwtResponse.setMessage(user.getRole().equalsIgnoreCase("user") ? "User logged in successfully" : "Driver logged in successfully");

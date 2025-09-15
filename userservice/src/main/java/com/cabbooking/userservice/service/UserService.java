@@ -12,4 +12,6 @@ public interface UserService
     public UserServiceResponse registerUser(UserRequest userRequest);
 
     UserDto getUserById(String id) throws UserNotFoundException;
+
+    UserDto getUserByEmail(String email) throws UserNotFoundException;
 }

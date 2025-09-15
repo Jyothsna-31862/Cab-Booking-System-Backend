@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = "http://localhost:4200")
@@ -36,5 +36,12 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") String id) throws UserNotFoundException {
         UserDto userById = userService.getUserById(id);
         return new ResponseEntity<>(userById, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get user by Email")
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable("email") String email) throws UserNotFoundException {
+        UserDto userByEmail = userService.getUserByEmail(email);
+        return new ResponseEntity<>(userByEmail, HttpStatus.OK);
     }
 }

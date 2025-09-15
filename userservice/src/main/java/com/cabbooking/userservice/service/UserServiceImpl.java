@@ -65,5 +65,18 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(user, UserDto.class);
     }
+
+    @Override
+    public UserDto getUserByEmail(String email) throws UserNotFoundException {
+        log.info("Fetching user with email: {}", email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", email);
+                    return new UserNotFoundException("User with email " + email + " not found");
+                });
+
+        return modelMapper.map(user, UserDto.class);
+    }
 }
 

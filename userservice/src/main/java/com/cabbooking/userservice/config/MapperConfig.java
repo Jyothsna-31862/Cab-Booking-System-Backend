@@ -17,7 +17,6 @@ public class MapperConfig {
     @Bean
     public Integer generateCode(){
         Random random = new Random();
-        int code = 1000 + random.nextInt(9000);
-        return code;
+        return 1000 + random.nextInt(9000);
     }
 }
