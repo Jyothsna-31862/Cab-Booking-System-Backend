@@ -1,4 +1,4 @@
-package com.cabbooking.driverservice;
+package com.cabbooking;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
