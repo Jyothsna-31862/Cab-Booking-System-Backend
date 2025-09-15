@@ -19,5 +19,5 @@ public interface DriverService {
     DriverDto updateDriverStatus(String id) throws DriverNotFoundException;
     DriverDto getAvailableDrivers(String carSeater);
 
-
+    DriverDto getDriverByEmail(String email);
 }

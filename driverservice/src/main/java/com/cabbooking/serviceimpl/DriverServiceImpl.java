@@ -1,4 +1,4 @@
-package com.cabbooking.serviceImpl;
+package com.cabbooking.serviceimpl;
 
 import com.cabbooking.dto.DriverDto;
 import com.cabbooking.dto.DriverRequest;
@@ -95,7 +95,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     public DriverDto updateDriverStatus(String id) throws DriverNotFoundException {
-        log.info("Updating status for driver ID: {} to {}", id);
+        log.info("Updating status for driver ID: {}", id);
         Driver driver = driverRepository.findByDriverId(id)
                 .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
         driver.setAvailable(!driver.isAvailable());
@@ -112,5 +112,11 @@ public class DriverServiceImpl implements DriverService {
                         return new DriverNotFoundException("No available drivers found");
                     });
             return modelMapper.map(availableDriver, DriverDto.class);
+    }
+
+    @Override
+    public DriverDto getDriverByEmail(String email) {
+        Driver driver = driverRepository.findByEmail(email).orElseThrow(() -> new DriverNotFoundException("Driver with Email " + email + " not found"));
+        return modelMapper.map(driver,DriverDto.class);
     }
 }

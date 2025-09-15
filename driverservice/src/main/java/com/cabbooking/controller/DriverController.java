@@ -4,18 +4,17 @@ import com.cabbooking.dto.DriverDto;
 import com.cabbooking.dto.DriverRequest;
 import com.cabbooking.dto.DriverServiceResponse;
 import com.cabbooking.dto.PasswordResetRequest;
-import com.cabbooking.dto.StatusUpdateRequest;
 import com.cabbooking.exception.DriverNotFoundException;
 import com.cabbooking.service.DriverService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/drivers")
+@RequestMapping("/api/drivers")
 @AllArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200/")
 public class DriverController {
@@ -73,6 +72,13 @@ public class DriverController {
       
         DriverDto updatedDriver = driverService.updateDriverStatus(id);
         return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
-}
+    }
+
+    @Operation(summary = "Get driver by Email")
+    @GetMapping("/email/{email}")
+    public ResponseEntity<DriverDto> getDriverByEmail(@PathVariable("email") String email) throws DriverNotFoundException {
+        DriverDto driverByEmail = driverService.getDriverByEmail(email);
+        return new ResponseEntity<>(driverByEmail, HttpStatus.OK);
+    }
 }
 

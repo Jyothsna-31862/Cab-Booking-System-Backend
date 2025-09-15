@@ -1,4 +1,4 @@
-package com.cabbooking.dto;
+package com.cabbooking.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class DriverServiceResponse {
     private DriverDto body;
-   private String status;
-   private String message;
+    private String status;
+    private String message;
 }

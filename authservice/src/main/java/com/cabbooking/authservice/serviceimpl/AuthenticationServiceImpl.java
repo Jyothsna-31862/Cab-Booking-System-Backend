@@ -1,5 +1,6 @@
 package com.cabbooking.authservice.serviceimpl;
 
+import com.cabbooking.authservice.client.DriverClient;
 import com.cabbooking.authservice.client.UserClient;
 import com.cabbooking.authservice.dto.*;
 import com.cabbooking.authservice.entity.User;
@@ -9,7 +10,6 @@ import com.cabbooking.authservice.security.JwtTokenProvider;
 import com.cabbooking.authservice.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +29,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserClient userClient;
-    private final ModelMapper modelMapper;
+    private final DriverClient driverClient;
 
 
     @Override
@@ -42,9 +42,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             JwtResponse jwtResponse = new JwtResponse();
             User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
             log.info("User found: {}", user);
-            UserDto userDto = userClient.getUserByEmail(user.getEmail()).getBody();
+            if(user.getRole().equalsIgnoreCase("driver")){
+                ResponseEntity<DriverDto> driverDtoResponse = driverClient.getDriverByEmail(user.getEmail());
+                DriverDto driverDto = driverDtoResponse.getBody();
+                jwtResponse.setId(driverDto.getDriverId());
 
-            jwtResponse.setUser(userDto);
+            }
+            else
+            {
+                ResponseEntity<UserDto> userDtoResponse = userClient.getUserByEmail(user.getEmail());
+                UserDto userDto = userDtoResponse.getBody();
+                jwtResponse.setId(userDto.getUserId());
+            }
             jwtResponse.setAccessToken(jwtTokenProvider.generateToken(authentication));
             jwtResponse.setRole(user.getRole());
             jwtResponse.setMessage(user.getRole().equalsIgnoreCase("user") ? "User logged in successfully" : "Driver logged in successfully");
@@ -56,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<UserServiceResponse> register(UserRequest userRequest) {
+    public ResponseEntity<UserServiceResponse> registerUser(UserRequest userRequest) {
 
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
         userRequest.setPassword(hashedPassword);
@@ -78,8 +87,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public ResponseEntity<DriverServiceResponse> registerDriver(DriverRequest driverRequest) {
+
+        String hashedPassword = passwordEncoder.encode(driverRequest.getPassword());
+        driverRequest.setPassword(hashedPassword);
+
+        ResponseEntity<DriverServiceResponse> driverResponse = driverClient.registerDriver(driverRequest);
+
+        if (driverResponse.getStatusCode() == HttpStatus.CREATED && driverResponse.getBody() != null) {
+            DriverDto driverDto = driverResponse.getBody().getBody();
+
+            User user = new User();
+            user.setEmail(driverDto.getEmail());
+            user.setRole(driverRequest.getRole());
+            user.setPassword(hashedPassword);
+            userRepository.save(user);
+            return driverResponse;
+        }
+
+        return driverResponse;
+    }
+
+    @Override
     public String resetPassword(ForgotPassword forgotPassword) {
-        User user = userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));;
+        User user = userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
 
 
         user.setPassword(passwordEncoder.encode(forgotPassword.getNewPassword()));

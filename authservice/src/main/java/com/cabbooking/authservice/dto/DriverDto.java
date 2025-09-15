@@ -1,4 +1,4 @@
-package com.cabbooking.dto;
+package com.cabbooking.authservice.dto;
 
 import lombok.Data;
 
