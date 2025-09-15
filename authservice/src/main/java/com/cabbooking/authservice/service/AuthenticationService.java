@@ -1,12 +1,11 @@
 package com.cabbooking.authservice.service;
 
-import com.cabbooking.authservice.dto.ForgotPassword;
-import com.cabbooking.authservice.dto.LoginDto;
-import com.cabbooking.authservice.dto.UserDto;
+import com.cabbooking.authservice.dto.*;
+import org.springframework.http.ResponseEntity;
 
 public interface AuthenticationService {
-    String login(LoginDto loginDto);
+    JwtResponse login(LoginDto loginDto);
 
-    String register(UserDto userDto);
+    ResponseEntity<UserServiceResponse> register(UserRequest userRequest);
     String resetPassword(ForgotPassword forgotPassword);
 }

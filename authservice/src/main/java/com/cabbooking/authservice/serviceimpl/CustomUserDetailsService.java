@@ -1,6 +1,7 @@
-package com.cabbooking.authservice.service;
+package com.cabbooking.authservice.serviceimpl;
 
 import com.cabbooking.authservice.entity.User;
+import com.cabbooking.authservice.exception.UserNotFoundException;
 import com.cabbooking.authservice.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email){
-        User u = userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException(email));
+        User u = userRepository.findByEmail(email).orElseThrow(()-> new UserNotFoundException(email));
 
         return org.springframework.security.core.userdetails.User.builder().username(u.getEmail()).password(u.getPassword())
                 .roles(u.getRole()).build();

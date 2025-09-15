@@ -1,6 +1,5 @@
 package com.cabbooking.authservice.repository;
 
-import com.cabbooking.authservice.dto.UserDto;
 import com.cabbooking.authservice.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
