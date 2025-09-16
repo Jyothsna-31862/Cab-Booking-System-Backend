@@ -46,6 +46,7 @@ public class DriverServiceImpl implements DriverService {
         log.info("Getting driver by ID: {}", id);
             Driver driver = driverRepository.findByDriverId(id)
                     .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
+            log.info("Driver found: {}", driver);
             return modelMapper.map(driver, DriverDto.class);
     }
    
