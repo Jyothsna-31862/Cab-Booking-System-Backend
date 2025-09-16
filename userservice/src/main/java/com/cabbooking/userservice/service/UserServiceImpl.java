@@ -108,5 +108,20 @@ public class UserServiceImpl implements UserService {
         return userResponse;
     }
 
+    @Override
+    public String deleteUser(String email) throws UserNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", email);
+                    return new UserNotFoundException("User with email " + email + " not found");
+                });
+
+        userRepository.delete(user);
+
+        log.info("User deleted successfully with email: {}", email);
+
+        return "User Deleted Successfully";
+    }
+
 }
 
