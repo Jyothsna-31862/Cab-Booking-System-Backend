@@ -11,7 +11,7 @@
 	<groupId>com.cabbooking</groupId>
 	<artifactId>authservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>authservice</name>
+	<name>auth-service</name>
 	<description>Auth Service for Cab Booking</description>
 	<url/>
 	<licenses>

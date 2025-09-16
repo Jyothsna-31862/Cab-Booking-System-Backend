@@ -1,17 +1,18 @@
 package com.cabbooking.rideservice.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RideDto {
-    private String rideId;
+public class RideRequest {
 
     private String userId;
 
@@ -27,20 +28,11 @@ public class RideDto {
 
     private String bookingTime;
 
-    private LocalDateTime requestedAt;
-
-    private LocalDateTime assignedAt;
-
-    private LocalDateTime startedAt;
-
-    private LocalDateTime completedAt;
-
-    private boolean immediateBooking;
+    private Boolean immediateBooking;
 
     private BigDecimal fare;
 
     private BigDecimal distance;
 
     private String status;
-
 }
