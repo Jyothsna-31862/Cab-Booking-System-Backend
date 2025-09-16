@@ -12,4 +12,5 @@ public interface PaymentService {
 	
     PaymentDto createPayment(PaymentDto paymentDto);   
     PaymentDto getPaymentById(Integer paymentId);
+    byte[] generateReceiptPdf(PaymentDto paymentDto);
 }
