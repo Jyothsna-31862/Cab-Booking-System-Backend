@@ -1,11 +1,71 @@
+//package com.cabbooking.paymentservice.serviceimpl;
+//
+//import java.util.Optional;
+//
+//import com.cabbooking.paymentservice.exception.PaymentFailedException;
+//import com.cabbooking.paymentservice.exception.PaymentNotFoundException;
+//import org.modelmapper.ModelMapper;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//
+//import com.cabbooking.paymentservice.dto.PaymentDto;
+//import com.cabbooking.paymentservice.entity.Payment;
+//import com.cabbooking.paymentservice.repository.PaymentRepository;
+//import com.cabbooking.paymentservice.service.PaymentService;
+//
+//@Service
+//public class PaymentServiceImpl implements PaymentService {
+//
+//	private final PaymentRepository paymentRepository;
+//
+//	private final ModelMapper modelMapper;
+//
+//	public PaymentServiceImpl(PaymentRepository paymentRepository, ModelMapper modelMapper) {
+//		this.paymentRepository = paymentRepository;
+//		this.modelMapper = modelMapper;
+//	}
+//
+//	@Override
+//	public PaymentDto createPayment(PaymentDto paymentDto) {
+//
+//		if ("failed".equalsIgnoreCase(paymentDto.getStatus())) {
+//			throw new PaymentFailedException("Payment with status 'failed' cannot be processed.");
+//		}
+//
+//		Payment payment = modelMapper.map(paymentDto, Payment.class);
+//
+//		Payment savedPayment = paymentRepository.save(payment);
+//
+//		return modelMapper.map(savedPayment, PaymentDto.class);
+//	}
+//
+//	@Override
+//	public PaymentDto getPaymentById(Integer paymentId) {
+//		return paymentRepository.findById(paymentId)
+//				.map(payment -> modelMapper.map(payment, PaymentDto.class))
+//				.orElseThrow(() -> new PaymentNotFoundException("Payment with ID " + paymentId + " not found."));
+//	}
+//
+//
+//
+//
+//
+//}
+
 package com.cabbooking.paymentservice.serviceimpl;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Optional;
 
 import com.cabbooking.paymentservice.exception.PaymentFailedException;
 import com.cabbooking.paymentservice.exception.PaymentNotFoundException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfDocument;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cabbooking.paymentservice.dto.PaymentDto;
@@ -14,6 +74,7 @@ import com.cabbooking.paymentservice.repository.PaymentRepository;
 import com.cabbooking.paymentservice.service.PaymentService;
 
 @Service
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
 	private final PaymentRepository paymentRepository;
@@ -27,27 +88,99 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public PaymentDto createPayment(PaymentDto paymentDto) {
+		log.info("Attempting to create payment for user: {}", paymentDto.getUserId());
 
 		if ("failed".equalsIgnoreCase(paymentDto.getStatus())) {
+			log.error("Payment creation failed: status is 'failed'. User: {}", paymentDto.getUserId());
 			throw new PaymentFailedException("Payment with status 'failed' cannot be processed.");
 		}
 
 		Payment payment = modelMapper.map(paymentDto, Payment.class);
+		log.debug("Mapped PaymentDto to Payment entity for processing.");
 
-		Payment savedPayment = paymentRepository.save(payment);
-
-		return modelMapper.map(savedPayment, PaymentDto.class);
+		try {
+			Payment savedPayment = paymentRepository.save(payment);
+			log.info("Successfully created payment with ID: {}", savedPayment.getPaymentId());
+			return modelMapper.map(savedPayment, PaymentDto.class);
+		} catch (Exception e) {
+			log.error("An error occurred while saving the payment to the repository.", e);
+			throw new RuntimeException("Payment saving failed unexpectedly.", e);
+		}
 	}
 
 	@Override
 	public PaymentDto getPaymentById(Integer paymentId) {
-		return paymentRepository.findById(paymentId)
-				.map(payment -> modelMapper.map(payment, PaymentDto.class))
-				.orElseThrow(() -> new PaymentNotFoundException("Payment with ID " + paymentId + " not found."));
+		log.info("Fetching payment with ID: {}", paymentId);
+		Optional<Payment> paymentOptional = paymentRepository.findById(paymentId);
+
+		if (paymentOptional.isPresent()) {
+			log.info("Found payment with ID: {}", paymentId);
+			return modelMapper.map(paymentOptional.get(), PaymentDto.class);
+		} else {
+			log.warn("Payment with ID {} not found.", paymentId);
+			throw new PaymentNotFoundException("Payment with ID " + paymentId + " not found.");
+		}
 	}
 
 
+	@Override
+	public byte[] generateReceiptPdf(PaymentDto paymentDto) {
+		log.info("Generating invoice for payment Id: {}", paymentDto.getPaymentId());
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			Document document = new Document();
+			PdfWriter.getInstance(document, baos);
+			document.open();
 
+			// Invoice Title
+			Paragraph title = new Paragraph("Payment Invoice");
+			title.setAlignment(Paragraph.ALIGN_CENTER);
+			document.add(title);
+			document.add(new Paragraph(" ")); // Empty line
+
+			// Invoice Table
+			PdfPTable table = new PdfPTable(2);
+			table.setWidthPercentage(80);
+			table.setSpacingBefore(10f);
+			table.setSpacingAfter(10f);
+
+			table.addCell("Payment Id");
+			table.addCell(String.valueOf(paymentDto.getPaymentId()));
+
+			table.addCell("Ride Id");
+			table.addCell(String.valueOf(paymentDto.getRideId()));
+
+			table.addCell("Amount");
+			table.addCell(String.valueOf(paymentDto.getAmount()));
+
+			table.addCell("Card Number");
+			table.addCell(maskCardNumber(paymentDto.getCardNumber()));
+
+			table.addCell("Status");
+			table.addCell(paymentDto.getStatus());
+
+			document.add(table);
+
+			document.add(new Paragraph("Thank you for your payment!",
+					new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD)));
+
+			document.close();
+			log.info("Invoice for payment Id {} generated successfully.", paymentDto.getPaymentId());
+			return baos.toByteArray();
+		} catch (Exception e) {
+			log.error("An error occurred during PDF generation for payment Id {}.", paymentDto.getPaymentId());
+			throw new RuntimeException("Failed to generate PDF INVOICE.", e);
+		}
+	}
+
+
+	private String maskCardNumber(String cardNumber) {
+		if (cardNumber == null || cardNumber.length() < 16) {
+			return "Not enough digits to mask"; // Not enough digits to mask
+		}
+		String lastFourDigits = cardNumber.substring(cardNumber.length() - 4);
+		return "**** **** **** " + lastFourDigits;
+	}
 
 
 }
+

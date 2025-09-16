@@ -38,6 +38,8 @@ public class Payment {
 
     private String status;
 
+    private String maskedCardNumber;
+
     @CreationTimestamp
     private Timestamp createdAt;
 

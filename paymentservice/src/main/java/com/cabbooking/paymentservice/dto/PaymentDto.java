@@ -19,4 +19,5 @@ public class PaymentDto {
     private BigDecimal amount;
     private String method;
     private String status;
+    private String cardNumber;
 }
