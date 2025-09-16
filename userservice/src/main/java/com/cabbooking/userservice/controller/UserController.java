@@ -45,7 +45,6 @@ public class UserController {
         return new ResponseEntity<>(userByEmail, HttpStatus.OK);
     }
 
-// Add this method inside UserController
 
     @Operation(summary = "Update user by ID")
     @PutMapping("/update/{id}")
