@@ -38,4 +38,12 @@ public class AuthenticationController {
         String s = authenticationService.resetPassword(forgotPassword);
         return ResponseEntity.ok(s);
     }
+
+    @DeleteMapping("/delete/{email}")
+    @Operation(summary = "Delete user by ID")
+    public ResponseEntity<String> deleteUserByEmail(@PathVariable("email") String email){
+        return authenticationService.deleteUserByEmail(email);
+    }
+
+
 }
