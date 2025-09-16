@@ -16,4 +16,6 @@ public interface UserService
     UserDto getUserByEmail(String email) throws UserNotFoundException;
 
     UserServiceResponse updateUser(String id, UserRequest userRequest) throws UserNotFoundException;
+
+    String deleteUser(String email) throws UserNotFoundException;
 }

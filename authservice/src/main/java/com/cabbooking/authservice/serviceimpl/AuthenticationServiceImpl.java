@@ -8,6 +8,7 @@ import com.cabbooking.authservice.exception.AuthenticationAPIException;
 import com.cabbooking.authservice.repository.UserRepository;
 import com.cabbooking.authservice.security.JwtTokenProvider;
 import com.cabbooking.authservice.service.AuthenticationService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,20 +37,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public JwtResponse login(LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginDto.getEmail(),loginDto.getPassword()
+                    loginDto.getEmail(), loginDto.getPassword()
             ));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             JwtResponse jwtResponse = new JwtResponse();
             User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
             log.info("User found: {}", user);
-            if(user.getRole().equalsIgnoreCase("driver")){
+            if (user.getRole().equalsIgnoreCase("driver")) {
                 ResponseEntity<DriverDto> driverDtoResponse = driverClient.getDriverByEmail(user.getEmail());
                 DriverDto driverDto = driverDtoResponse.getBody();
                 jwtResponse.setId(driverDto.getDriverId());
 
-            }
-            else
-            {
+            } else {
                 ResponseEntity<UserDto> userDtoResponse = userClient.getUserByEmail(user.getEmail());
                 UserDto userDto = userDtoResponse.getBody();
                 jwtResponse.setId(userDto.getUserId());
@@ -59,8 +58,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             jwtResponse.setMessage(user.getRole().equalsIgnoreCase("user") ? "User logged in successfully" : "Driver logged in successfully");
             return jwtResponse;
 
-        }catch (Exception e){
-            throw new AuthenticationAPIException(HttpStatus.UNAUTHORIZED,"Invalid email or password");
+        } catch (Exception e) {
+            throw new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
     }
 
@@ -119,4 +118,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return "Password has been reset successfully.";
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> deleteUserByEmail(String email) {
+
+        ResponseEntity<String> response = userClient.deleteUser(email);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            userRepository.deleteByEmail(email);
+        }
+        return response;
+
+    }
 }
+

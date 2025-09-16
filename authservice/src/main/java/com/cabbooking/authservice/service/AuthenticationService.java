@@ -9,4 +9,5 @@ public interface AuthenticationService {
     ResponseEntity<UserServiceResponse> registerUser(UserRequest userRequest);
     ResponseEntity<DriverServiceResponse> registerDriver(DriverRequest driverResponse);
     String resetPassword(ForgotPassword forgotPassword);
+    ResponseEntity<String> deleteUserByEmail(String email);
 }
