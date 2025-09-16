@@ -1,10 +1,9 @@
-package com.cabbooking.authservice.controllers;
+package com.cabbooking.authservice.controller;
 
 import com.cabbooking.authservice.dto.*;
 import com.cabbooking.authservice.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
