@@ -1,8 +1,12 @@
 package com.cabbooking.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class DriverDto {
     private String driverId;
     private String fullName;
@@ -14,5 +18,7 @@ public class DriverDto {
     private String vehicleName;
     private String carSeater;
     private double rating;
+
+    @JsonProperty("isAvailable")
     private boolean isAvailable;
 }
