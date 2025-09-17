@@ -1,5 +1,4 @@
 package com.cabbooking.controller;
-import com.cabbooking.dto.AvailabilityRequest;
 import com.cabbooking.dto.DriverDto;
 import com.cabbooking.dto.DriverRequest;
 import com.cabbooking.dto.DriverServiceResponse;
@@ -9,6 +8,7 @@ import com.cabbooking.service.DriverService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/drivers")
 @AllArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200/")
+@Slf4j
 public class DriverController {
 
     private final DriverService driverService;
@@ -26,6 +27,7 @@ public class DriverController {
     public ResponseEntity<DriverDto> getUserById(@PathVariable("id") String id) throws DriverNotFoundException {
 
         DriverDto DriverById = driverService.getDriverById(id);
+        log.info("Fetched driver with ID: {}", DriverById);
         return new ResponseEntity<>(DriverById, HttpStatus.OK);
 
     }
@@ -60,9 +62,9 @@ public class DriverController {
     
 
     
-    @GetMapping("/available")
-    public ResponseEntity<DriverDto> getAvailableDrivers(@RequestBody AvailabilityRequest availabilityRequest) {
-        DriverDto availableDrivers = driverService.getAvailableDrivers(availabilityRequest.getCarSeater());
+    @GetMapping(value = "/available",params = "carSeater" )
+    public ResponseEntity<DriverDto> getAvailableDrivers(@RequestParam("carSeater") String carSeater) {
+        DriverDto availableDrivers = driverService.getAvailableDrivers(carSeater);
         return new ResponseEntity<>(availableDrivers, HttpStatus.OK);
     }
 
