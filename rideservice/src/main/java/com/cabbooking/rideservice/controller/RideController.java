@@ -20,8 +20,6 @@ import java.util.Map;
 public class RideController {
     private final RideService rideService;
 
-
-
     @PostMapping("/book")
     public ResponseEntity<RideDto> bookARide(@RequestBody RideDto rideDto){
         return ResponseEntity.ok(rideService.bookARide(rideDto));
@@ -63,7 +61,7 @@ public class RideController {
             @RequestBody Map<String, String> statusUpdate) {
 
         String status = statusUpdate.get("status");
-        if (status == null || status.isEmpty()) {
+        if (status == null) {
             return ResponseEntity.badRequest().build();
         }
 

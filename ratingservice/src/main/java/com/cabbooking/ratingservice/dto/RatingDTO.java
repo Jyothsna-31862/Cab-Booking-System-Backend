@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-class RatingDTO {
+public class RatingDTO {
     private Integer ratingId;
     private Integer rideId;
     private Integer userId;
