@@ -4,9 +4,7 @@ import com.cabbooking.userservice.config.MapperConfig;
 import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
 import com.cabbooking.userservice.dto.UserServiceResponse;
-import com.cabbooking.userservice.exception.EmailAlreadyExistsException;
-import com.cabbooking.userservice.exception.PhoneAlreadyExistsException;
-import com.cabbooking.userservice.exception.UserNotFoundException;
+import com.cabbooking.userservice.exception.*;
 import com.cabbooking.userservice.model.User;
 import com.cabbooking.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -121,6 +119,22 @@ public class UserServiceImpl implements UserService {
         log.info("User deleted successfully with email: {}", email);
 
         return "User Deleted Successfully";
+    }
+
+    @Override
+    public SuccessResponse verifyOtp(String userId, String code) throws UserNotFoundException {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> {
+                    log.error("User not found with ID: {}", userId);
+                    return new UserNotFoundException("User with ID " + userId + " not found");
+                });
+
+        if (!(user.getCode().toString().equals(code))) {
+
+            throw new CodeNotMatchedException("Invalid code.");
+
+        }
+        return new SuccessResponse("success","Code verified successfully." );
     }
 
 }

@@ -3,6 +3,7 @@ package com.cabbooking.userservice.controller;
 import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
 import com.cabbooking.userservice.dto.UserServiceResponse;
+import com.cabbooking.userservice.exception.SuccessResponse;
 import com.cabbooking.userservice.exception.UserNotFoundException;
 import com.cabbooking.userservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,10 +59,18 @@ public class UserController {
 
     @Operation(summary = "Delete user by ID")
     @DeleteMapping("/delete/{email}")
-    public ResponseEntity<String> deleteUser(@PathVariable("email") String email) throws UserNotFoundException {
+    public ResponseEntity<String> deleteUser(@PathVariable("email") String email) throws UserNotFoundException{
         String response=userService.deleteUser(email);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/verify-otp/{userId}/{code}")
+    @Operation(summary = "Verify OTP for user")
+    public ResponseEntity<SuccessResponse> verifyOtp(
+            @PathVariable("userId") String userId,
+            @PathVariable("code") String code) throws UserNotFoundException{
+        return ResponseEntity.ok(userService.verifyOtp(userId, code));
     }
 
 
