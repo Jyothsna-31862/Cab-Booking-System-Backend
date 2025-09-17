@@ -1,4 +1,4 @@
-package com.cabbooking.ratingservice.model;
+package com.cabbooking.ratingservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

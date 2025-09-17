@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.cabbooking.paymentservice.dto.PaymentDto;
 import com.cabbooking.paymentservice.service.PaymentService;
 
+@CrossOrigin("https://localhost:4200")
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
