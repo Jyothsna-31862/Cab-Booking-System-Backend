@@ -4,8 +4,8 @@ import com.cabbooking.locationservice.dto.LocationDto;
 import com.cabbooking.locationservice.exception.LocationNotFoundException;
 import com.cabbooking.locationservice.model.Location;
 import com.cabbooking.locationservice.repository.LocationRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,10 +18,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-        import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.*;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
-class LocationServiceTests {
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+public class LocationServiceTests {
 
     @Mock
     private LocationRepository locationRepository;
@@ -38,6 +40,16 @@ class LocationServiceTests {
     private LocationDto locationDto2;
 
     @BeforeEach
+    void logStart(TestInfo testInfo) {
+        log.info("Starting test: {}", testInfo.getDisplayName());
+    }
+
+    @AfterEach
+    void logEnd(TestInfo testInfo) {
+        log.info("Finished test: {}", testInfo.getDisplayName());
+    }
+
+    @BeforeEach
     void setUp() {
         location1 = new Location(1, "Koyambedu", "West Chennai", new BigDecimal("13.0694"), new BigDecimal("80.1948"), null, null);
         location2 = new Location(2, "Guindy", "South and East Chennai", new BigDecimal("13.0067"), new BigDecimal("80.2206"), null, null);
@@ -46,6 +58,7 @@ class LocationServiceTests {
     }
 
     @Test
+    @DisplayName("1️. getLocations() should return all LocationDto objects")
     void getLocations_shouldReturnAllLocations() {
         when(locationRepository.findAll()).thenReturn(Arrays.asList(location1, location2));
         when(modelMapper.map(location1, LocationDto.class)).thenReturn(locationDto1);
@@ -62,6 +75,7 @@ class LocationServiceTests {
     }
 
     @Test
+    @DisplayName("2. getLocationByArea() should return LocationDto when area exists")
     void getLocationByArea_shouldReturnLocationDto_whenLocationExists() {
         String area = "Koyambedu";
         when(locationRepository.findByArea(area)).thenReturn(Optional.of(location1));
@@ -78,6 +92,7 @@ class LocationServiceTests {
     }
 
     @Test
+    @DisplayName("3️. getLocationByArea() should throw LocationNotFoundException when area is missing")
     void getLocationByArea_shouldThrowLocationNotFoundException_whenLocationDoesNotExist() {
         String area = "NonExistentArea";
         when(locationRepository.findByArea(area)).thenReturn(Optional.empty());

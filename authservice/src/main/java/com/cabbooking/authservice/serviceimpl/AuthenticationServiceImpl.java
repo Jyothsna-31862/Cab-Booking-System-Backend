@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -64,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<UserServiceResponse> registerUser(UserRequest userRequest) {
+    public UserServiceResponse registerUser(UserRequest userRequest) {
 
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
         userRequest.setPassword(hashedPassword);
@@ -79,14 +81,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user.setRole(userRequest.getRole());
             user.setPassword(hashedPassword);
             userRepository.save(user);
-            return userServiceResponse;
+            return userServiceResponse.getBody();
         }
 
-        return userServiceResponse;
+        return userServiceResponse.getBody();
     }
 
     @Override
-    public ResponseEntity<DriverServiceResponse> registerDriver(DriverRequest driverRequest) {
+    public DriverServiceResponse registerDriver(DriverRequest driverRequest) {
 
         String hashedPassword = passwordEncoder.encode(driverRequest.getPassword());
         driverRequest.setPassword(hashedPassword);
@@ -101,10 +103,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user.setRole(driverRequest.getRole());
             user.setPassword(hashedPassword);
             userRepository.save(user);
-            return driverResponse;
+            return driverResponse.getBody();
         }
 
-        return driverResponse;
+        return driverResponse.getBody();
     }
 
     @Override
@@ -121,15 +123,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> deleteUserByEmail(String email) {
+    public String deleteUserByEmail(String email) {
 
         ResponseEntity<String> response = userClient.deleteUser(email);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             userRepository.deleteByEmail(email);
         }
-        return response;
+        return response.getBody();
 
+    }
+
+    @Override
+    public AuthResponse validateToken(ValidateTokenRequest tokenRequest) {
+        jwtTokenProvider.validateToken(tokenRequest.getToken());
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setStatus("success");
+        authResponse.setMessage("Token is valid");
+        authResponse.setTimeStamp(LocalDateTime.now());
+        return authResponse;
     }
 }
 
