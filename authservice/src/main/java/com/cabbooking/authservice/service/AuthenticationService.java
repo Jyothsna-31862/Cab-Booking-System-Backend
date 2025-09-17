@@ -6,8 +6,9 @@ import org.springframework.http.ResponseEntity;
 public interface AuthenticationService {
     JwtResponse login(LoginDto loginDto);
 
-    ResponseEntity<UserServiceResponse> registerUser(UserRequest userRequest);
-    ResponseEntity<DriverServiceResponse> registerDriver(DriverRequest driverResponse);
+    UserServiceResponse registerUser(UserRequest userRequest);
+    DriverServiceResponse registerDriver(DriverRequest driverResponse);
     String resetPassword(ForgotPassword forgotPassword);
-    ResponseEntity<String> deleteUserByEmail(String email);
+    String deleteUserByEmail(String email);
+    AuthResponse validateToken(ValidateTokenRequest tokenRequest);
 }
