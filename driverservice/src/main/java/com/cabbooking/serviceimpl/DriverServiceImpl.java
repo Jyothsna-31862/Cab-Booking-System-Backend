@@ -70,6 +70,7 @@ public class DriverServiceImpl implements DriverService {
            
         modelMapper.map(driverRequest, driver);
         driver.setDriverId(id);
+
         Driver updatedDriver = driverRepository.save(driver);
         log.info("Driver profile updated successfully");
         return modelMapper.map(updatedDriver, DriverDto.class);
