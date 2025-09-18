@@ -1,5 +1,6 @@
 package com.cabbooking.rideservice.controller;
 
+import com.cabbooking.rideservice.dto.CancelDto;
 import com.cabbooking.rideservice.dto.RideDto;
 import com.cabbooking.rideservice.dto.SuccessResponseDto;
 import com.cabbooking.rideservice.service.RideService;
@@ -66,6 +67,14 @@ public class RideController {
         }
 
         return ResponseEntity.ok(rideService.updateRideStatus(rideId, status));
+    }
+
+    @PatchMapping("/cancel/{rideId}")
+    public ResponseEntity<SuccessResponseDto> cancelRideStatus(
+            @PathVariable String rideId,
+            @RequestBody CancelDto statusUpdate) {
+
+        return ResponseEntity.ok(rideService.cancelRideStatus(rideId, statusUpdate));
     }
 
 
