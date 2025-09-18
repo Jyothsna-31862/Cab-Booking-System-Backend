@@ -1,5 +1,6 @@
 package com.cabbooking.rideservice.controller;
 
+import com.cabbooking.rideservice.dto.CancelDto;
 import com.cabbooking.rideservice.dto.RideDto;
 import com.cabbooking.rideservice.dto.SuccessResponseDto;
 import com.cabbooking.rideservice.service.RideService;
@@ -19,8 +20,6 @@ import java.util.Map;
 @RequestMapping("/api/rides")
 public class RideController {
     private final RideService rideService;
-
-
 
     @PostMapping("/book")
     public ResponseEntity<RideDto> bookARide(@RequestBody RideDto rideDto){
@@ -63,11 +62,19 @@ public class RideController {
             @RequestBody Map<String, String> statusUpdate) {
 
         String status = statusUpdate.get("status");
-        if (status == null || status.isEmpty()) {
+        if (status == null) {
             return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(rideService.updateRideStatus(rideId, status));
+    }
+
+    @PatchMapping("/cancel/{rideId}")
+    public ResponseEntity<SuccessResponseDto> cancelRideStatus(
+            @PathVariable String rideId,
+            @RequestBody CancelDto statusUpdate) {
+
+        return ResponseEntity.ok(rideService.cancelRideStatus(rideId, statusUpdate));
     }
 
 

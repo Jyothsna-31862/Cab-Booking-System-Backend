@@ -1,18 +1,14 @@
 package com.cabbooking.authservice.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class ErrorResponse {
-    private int status;
+    private String status = "error";
     private String message;
     private LocalDateTime timestamp;
 }

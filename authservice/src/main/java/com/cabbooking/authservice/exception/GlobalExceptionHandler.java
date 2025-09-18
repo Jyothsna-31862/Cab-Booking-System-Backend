@@ -26,32 +26,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
-            ErrorResponse error = new ErrorResponse(
-                    ex.getStatus().value(),
-                    ex.getMessage(),
-                    LocalDateTime.now()
-            );
+            ErrorResponse error = new ErrorResponse();
+            error.setMessage(error.getMessage());
+            error.setTimestamp(LocalDateTime.now());
             return new ResponseEntity<>(error, ex.getStatus());
         }
 
 
     @ExceptionHandler(AuthenticationAPIException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationAPIException(AuthenticationAPIException ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse(
-                ex.getStatus().value(),
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage(ex.getMessage());
+        error.setTimestamp(LocalDateTime.now());
         return new ResponseEntity<>(error, ex.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                ex.getMessage(),
-                LocalDateTime.now()
-        );
+        ErrorResponse error = new ErrorResponse();
+        error.setMessage("An unexpected error occurred: " + ex.getMessage());
+        error.setTimestamp(LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

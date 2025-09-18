@@ -1,5 +1,6 @@
 package com.cabbooking.rideservice.serviceImpl;
 
+import com.cabbooking.rideservice.dto.CancelDto;
 import com.cabbooking.rideservice.dto.RideDto;
 import com.cabbooking.rideservice.dto.SuccessResponseDto;
 import com.cabbooking.rideservice.entity.Ride;
@@ -29,6 +30,7 @@ public class RideServiceImpl implements RideService {
         Ride ride= modelMapper.map(rideDto,Ride.class);
         ride.setStatus("PENDING");
         ride.setRequestedAt(LocalDateTime.now());
+        ride.setAssignedAt(LocalDateTime.now());
 
         Ride newRide = rideRepository.save(ride);
 
@@ -80,10 +82,39 @@ public class RideServiceImpl implements RideService {
 
         ride.setStatus(status.toUpperCase());
 
+        switch (status.toUpperCase()) {
+//            case "ACCEPTED":
+//                ride.setAcceptedAt(LocalDateTime.now());
+//                break;
+            case "ONGOING":
+                ride.setStartedAt(LocalDateTime.now());
+                break;
+            case "COMPLETED":
+                ride.setCompletedAt(LocalDateTime.now());
+                break;
+            default:
+                break;
+        }
+
         rideRepository.save(ride);
         String message = String.format("Ride status successfully updated to '%s'", status.toUpperCase());
         return new SuccessResponseDto(new Date(), message, "success");
     }
+
+    @Override
+    public SuccessResponseDto cancelRideStatus(String rideId, CancelDto cancelDto) {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(() -> new RideNotFoundException(rideId));
+
+        ride.setStatus("CANCELLED");
+        ride.setCancelledAt(LocalDateTime.now());
+        ride.setCancelledBy(cancelDto.getCancelledBy());
+
+        rideRepository.save(ride);
+
+        String message = String.format("Ride is cancelled by '%s'", cancelDto.getCancelledBy());
+        return new SuccessResponseDto(new Date(), message, "success");
+    }
+
 
 
     public RideDto getNewestImmediateRideForDriver(String driverId) {
