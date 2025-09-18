@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class UserNotFoundException extends RuntimeException {
 
-    private HttpStatus status;
-    private String message;
+    private final HttpStatus status;
+    private final String message;
 
     public UserNotFoundException(String email) {
         super("User not found with email: " + email);
