@@ -13,11 +13,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class PaymentDto {
 
-    private Integer paymentId;
-    private Integer rideId;
-    private Integer userId;
+    private String paymentId;
+    private String rideId;
+    private String userId;
     private BigDecimal amount;
     private String method;
     private String status;
-    private String cardNumber;
 }

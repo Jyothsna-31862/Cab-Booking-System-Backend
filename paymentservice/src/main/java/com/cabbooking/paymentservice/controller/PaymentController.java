@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.cabbooking.paymentservice.dto.PaymentDto;
 import com.cabbooking.paymentservice.service.PaymentService;
 
-@CrossOrigin("https://localhost:4200")
+@CrossOrigin("http://localhost:4200/")
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -28,19 +28,19 @@ public class PaymentController {
 	@PostMapping
 	public ResponseEntity<ApiResponse> createPayment(@RequestBody PaymentDto paymentDto) {
 		PaymentDto newPayment = paymentService.createPayment(paymentDto);
-		ApiResponse apiResponse = new ApiResponse(true, "Payment created successfully", newPayment);
+		ApiResponse apiResponse = new ApiResponse("success", "Payment created successfully", newPayment);
 		return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{paymentId}")
-	public ResponseEntity<ApiResponse> getPaymentById(@PathVariable Integer paymentId) {
+	public ResponseEntity<ApiResponse> getPaymentById(@PathVariable String paymentId) {
 		PaymentDto payment = paymentService.getPaymentById(paymentId);
-		ApiResponse apiResponse = new ApiResponse(true, "Payment retrieved successfully", payment);
+		ApiResponse apiResponse = new ApiResponse("success", "Payment retrieved successfully", payment);
 		return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 	}
 
 	@GetMapping("/receipt/{paymentId}")
-		public ResponseEntity<ByteArrayResource> generateReceipt(@PathVariable Integer paymentId) {
+		public ResponseEntity<ByteArrayResource> generateReceipt(@PathVariable String paymentId) {
 		try {
 			PaymentDto paymentDto = paymentService.getPaymentById(paymentId);
 

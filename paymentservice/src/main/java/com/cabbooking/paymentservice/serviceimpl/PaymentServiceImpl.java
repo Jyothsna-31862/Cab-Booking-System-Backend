@@ -109,7 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
-	public PaymentDto getPaymentById(Integer paymentId) {
+	public PaymentDto getPaymentById(String paymentId) {
 		log.info("Fetching payment with ID: {}", paymentId);
 		Optional<Payment> paymentOptional = paymentRepository.findById(paymentId);
 
@@ -151,9 +151,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 			table.addCell("Amount");
 			table.addCell(String.valueOf(paymentDto.getAmount()));
-
-			table.addCell("Card Number");
-			table.addCell(maskCardNumber(paymentDto.getCardNumber()));
 
 			table.addCell("Status");
 			table.addCell(paymentDto.getStatus());

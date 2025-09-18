@@ -11,6 +11,6 @@ import com.cabbooking.paymentservice.entity.Payment;
 public interface PaymentService {
 	
     PaymentDto createPayment(PaymentDto paymentDto);   
-    PaymentDto getPaymentById(Integer paymentId);
+    PaymentDto getPaymentById(String paymentId);
     byte[] generateReceiptPdf(PaymentDto paymentDto);
 }

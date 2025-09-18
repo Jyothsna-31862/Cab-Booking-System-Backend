@@ -1,18 +1,13 @@
 package com.cabbooking.paymentservice.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -26,11 +21,12 @@ import java.sql.Timestamp;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer paymentId;
+    @UuidGenerator
+    @Column(columnDefinition = "CHAR(36)")
+    private String paymentId;
 
-    private Integer rideId;
-    private Integer userId;
+    private String rideId;
+    private String userId;
     private BigDecimal amount;
 
 
