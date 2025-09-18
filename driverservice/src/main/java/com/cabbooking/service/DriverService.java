@@ -20,5 +20,8 @@ public interface DriverService {
     DriverDto getAvailableDrivers(String carSeater);
 
     DriverDto getDriverByEmail(String email);
+
+    // New method to update driver's average rating
+    DriverDto updateDriverRating(String driverId, double rating) throws DriverNotFoundException;
 }
 

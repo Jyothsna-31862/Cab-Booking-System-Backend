@@ -10,7 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import java.util.Optional;
+=======
+import java.util.List;
+>>>>>>> d2516d45a5aff0036773f348adff32f45c2e47aa
 
 @Service
 @Slf4j
@@ -37,7 +41,11 @@ public class RatingServiceImpl implements RatingService {
         Rating rating = modelMapper.map(ratingDTO, Rating.class);
         log.debug("Mapped DTO to entity: {}", rating);
 
+<<<<<<< HEAD
         Rating savedRating = null;
+=======
+        Rating savedRating;
+>>>>>>> d2516d45a5aff0036773f348adff32f45c2e47aa
         try {
             savedRating = ratingRepository.save(rating);
             log.info("Rating successfully saved with ID: {}", savedRating.getRatingId());
