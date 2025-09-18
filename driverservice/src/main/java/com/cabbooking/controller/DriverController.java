@@ -82,5 +82,12 @@ public class DriverController {
         DriverDto driverByEmail = driverService.getDriverByEmail(email);
         return new ResponseEntity<>(driverByEmail, HttpStatus.OK);
     }
-}
 
+    @PutMapping(value="/{id}/rating",params = "rating")
+    public ResponseEntity<DriverDto> updateDriverRating(
+            @PathVariable("id") String id,
+            @RequestParam("rating") double rating) throws DriverNotFoundException {
+        DriverDto updatedDriver = driverService.updateDriverRating(id, rating);
+        return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
+    }
+}

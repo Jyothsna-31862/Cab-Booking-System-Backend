@@ -49,7 +49,17 @@ public class DriverServiceImpl implements DriverService {
             log.info("Driver found: {}", driver);
             return modelMapper.map(driver, DriverDto.class);
     }
-   
+
+    @Override
+    public DriverDto updateDriverRating(String driverId, double rating) throws DriverNotFoundException {
+        log.info("Updating rating for driver ID: {} to {}", driverId, rating);
+        Driver driver = driverRepository.findByDriverId(driverId)
+                .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + driverId + " not found"));
+        driver.setRating(rating);
+        Driver updatedDriver = driverRepository.save(driver);
+        return modelMapper.map(updatedDriver, DriverDto.class);
+    }
+
     public DriverDto updateDriverProfile(String id, DriverRequest driverRequest) throws DriverNotFoundException {
         log.info("Updating driver profile for ID: {}", id);
 
