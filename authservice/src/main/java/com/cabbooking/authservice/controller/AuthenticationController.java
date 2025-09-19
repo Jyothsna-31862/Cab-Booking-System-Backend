@@ -37,9 +37,9 @@ public class AuthenticationController {
     }
 
     @PutMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPassword forgotPassword){
-        String s = authenticationService.resetPassword(forgotPassword);
-        return ResponseEntity.ok(s);
+    public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword){
+
+        return ResponseEntity.ok(authenticationService.resetPassword(forgotPassword));
     }
 
     @DeleteMapping("/delete/{email}")

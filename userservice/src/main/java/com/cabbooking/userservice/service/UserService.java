@@ -1,5 +1,6 @@
 package com.cabbooking.userservice.service;
 
+import com.cabbooking.userservice.dto.ForgotPassword;
 import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
 import com.cabbooking.userservice.dto.UserServiceResponse;
@@ -21,4 +22,6 @@ public interface UserService
     String deleteUser(String email) throws UserNotFoundException;
 
     SuccessResponse verifyOtp(String userId, String code) throws UserNotFoundException;
+
+    SuccessResponse forgotPassword(ForgotPassword forgotPassword) throws UserNotFoundException;
 }

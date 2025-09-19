@@ -1,5 +1,6 @@
 package com.cabbooking.userservice.controller;
 
+import com.cabbooking.userservice.dto.ForgotPassword;
 import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
 import com.cabbooking.userservice.dto.UserServiceResponse;
@@ -71,6 +72,12 @@ public class UserController {
             @PathVariable("userId") String userId,
             @PathVariable("code") String code) throws UserNotFoundException{
         return ResponseEntity.ok(userService.verifyOtp(userId, code));
+    }
+
+    @PutMapping("/forgot-password")
+    @Operation(summary = "Reset password for user")
+    public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword) throws UserNotFoundException {
+         return ResponseEntity.ok(userService.forgotPassword(forgotPassword));
     }
 
 

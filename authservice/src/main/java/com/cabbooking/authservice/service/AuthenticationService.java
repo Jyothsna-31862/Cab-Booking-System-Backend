@@ -8,7 +8,7 @@ public interface AuthenticationService {
 
     UserServiceResponse registerUser(UserRequest userRequest);
     DriverServiceResponse registerDriver(DriverRequest driverResponse);
-    String resetPassword(ForgotPassword forgotPassword);
+    SuccessResponse resetPassword(ForgotPassword forgotPassword);
     String deleteUserByEmail(String email);
     AuthResponse validateToken(ValidateTokenRequest tokenRequest);
 }

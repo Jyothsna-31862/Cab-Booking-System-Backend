@@ -110,15 +110,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public String resetPassword(ForgotPassword forgotPassword) {
+    public SuccessResponse resetPassword(ForgotPassword forgotPassword) {
         User user = userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
 
+        String encodePassword= passwordEncoder.encode(forgotPassword.getNewPassword());
+        user.setPassword(encodePassword);
 
-        user.setPassword(passwordEncoder.encode(forgotPassword.getNewPassword()));
+        forgotPassword.setNewPassword(encodePassword);
+
 
         userRepository.save(user);
 
-        return "Password has been reset successfully.";
+        return userClient.forgotPassword(forgotPassword).getBody();
     }
 
     @Override

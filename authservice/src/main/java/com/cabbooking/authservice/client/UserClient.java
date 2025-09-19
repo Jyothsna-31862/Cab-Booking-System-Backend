@@ -1,9 +1,8 @@
 package com.cabbooking.authservice.client;
 
 import com.cabbooking.authservice.config.FeignClientConfig;
-import com.cabbooking.authservice.dto.UserDto;
-import com.cabbooking.authservice.dto.UserRequest;
-import com.cabbooking.authservice.dto.UserServiceResponse;
+import com.cabbooking.authservice.dto.*;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,5 +21,9 @@ public interface UserClient {
 
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<String> deleteUser(@PathVariable("email") String email);
+
+    @PutMapping("/forgot-password")
+    public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword);
+
 
 }
