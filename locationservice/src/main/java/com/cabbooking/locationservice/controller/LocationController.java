@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/locations")
-@CrossOrigin("http://localhost:4200/")
 @RequiredArgsConstructor
 @Tag(name = "Location Controller", description = "API endpoints for location service")
 public class LocationController {
