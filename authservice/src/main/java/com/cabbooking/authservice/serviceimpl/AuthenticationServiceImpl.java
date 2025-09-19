@@ -136,13 +136,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthResponse validateToken(ValidateTokenRequest tokenRequest) {
-        jwtTokenProvider.validateToken(tokenRequest.getToken());
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setStatus("success");
-        authResponse.setMessage("Token is valid");
-        authResponse.setTimeStamp(LocalDateTime.now());
-        return authResponse;
+    public Boolean validateToken(String token) {
+        return jwtTokenProvider.validateToken(token.substring(7));
     }
 }
 

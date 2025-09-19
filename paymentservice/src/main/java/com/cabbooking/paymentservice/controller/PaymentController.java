@@ -1,6 +1,5 @@
 package com.cabbooking.paymentservice.controller;
 
-import java.util.Optional;
 
 import com.cabbooking.paymentservice.dto.ApiResponse;
 import org.springframework.core.io.ByteArrayResource;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import com.cabbooking.paymentservice.dto.PaymentDto;
 import com.cabbooking.paymentservice.service.PaymentService;
 
-@CrossOrigin("http://localhost:4200/")
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {

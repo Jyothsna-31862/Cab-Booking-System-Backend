@@ -1,51 +1,36 @@
 package com.cabbooking.apigateway.exception;
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@Component
-@Order(-1)
+@RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
+public class GlobalExceptionHandler {
 
-    @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        ServerHttpResponse response = exchange.getResponse();
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        log.error("Authentication error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.fail(ex.getMessage()));
+    }
 
-        if (response.isCommitted()) {
-            return Mono.error(ex);
-        }
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<ErrorResponse> handleFeignException(FeignException ex) {
+        HttpStatus status = ex.status() >= 500 ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.UNAUTHORIZED;
+        String message = ex.status() >= 500 ? "Auth service unavailable" : "Token validation failed";
+        log.error("Feign client error (status {}): {}", ex.status(), ex.getMessage());
+        return ResponseEntity.status(status)
+                .body(ErrorResponse.fail(message));
+    }
 
-        response.getHeaders().add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-
-        String message = "Internal Server Error";
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        if (ex.getMessage().contains("JWT") || ex.getMessage().contains("token")) {
-            status = HttpStatus.UNAUTHORIZED;
-            message = "Authentication failed";
-        }
-
-        response.setStatusCode(status);
-
-        String body = String.format(
-            "{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"message\":\"%s\",\"path\":\"%s\"}",
-            java.time.Instant.now().toString(),
-            status.value(),
-            status.getReasonPhrase(),
-            message,
-            exchange.getRequest().getPath().value()
-        );
-
-        DataBuffer buffer = response.bufferFactory().wrap(body.getBytes());
-        return response.writeWith(Mono.just(buffer));
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.fail("An unexpected error occurred"));
     }
 }

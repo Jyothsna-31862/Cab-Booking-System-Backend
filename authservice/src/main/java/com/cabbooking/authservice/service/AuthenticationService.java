@@ -10,5 +10,5 @@ public interface AuthenticationService {
     DriverServiceResponse registerDriver(DriverRequest driverResponse);
     String resetPassword(ForgotPassword forgotPassword);
     String deleteUserByEmail(String email);
-    AuthResponse validateToken(ValidateTokenRequest tokenRequest);
+    Boolean validateToken(String token);
 }
