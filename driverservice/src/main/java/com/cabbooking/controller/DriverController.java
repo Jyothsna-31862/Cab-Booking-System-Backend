@@ -82,10 +82,7 @@ public class DriverController {
         return new ResponseEntity<>(driverByEmail, HttpStatus.OK);
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> suresh
+    @Operation(summary = "Update driver rating by ID")
     @PutMapping(value="/{id}/rating",params = "rating")
     public ResponseEntity<DriverDto> updateDriverRating(
             @PathVariable("id") String id,

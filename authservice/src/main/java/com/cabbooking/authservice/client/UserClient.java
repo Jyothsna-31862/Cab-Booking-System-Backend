@@ -1,14 +1,9 @@
 package com.cabbooking.authservice.client;
 
-<<<<<<< HEAD
-import com.cabbooking.authservice.config.FeignClientConfig;
 import com.cabbooking.authservice.dto.*;
-import io.swagger.v3.oas.annotations.Operation;
-=======
 import com.cabbooking.authservice.dto.UserDto;
 import com.cabbooking.authservice.dto.UserRequest;
 import com.cabbooking.authservice.dto.UserServiceResponse;
->>>>>>> suresh
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
