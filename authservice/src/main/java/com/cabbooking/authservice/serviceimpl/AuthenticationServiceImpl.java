@@ -44,6 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             ));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             JwtResponse jwtResponse = new JwtResponse();
+            log.info("Authentication successful for email: {}", loginDto.getEmail());
             User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
             log.info("User found: {}", user);
             if (user.getRole().equalsIgnoreCase("driver")) {
@@ -62,6 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return jwtResponse;
 
         } catch (Exception e) {
+            log.info("Error during authentication for email: {}: {}", loginDto.getEmail(), e.getMessage());
             throw new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
     }
@@ -111,18 +113,39 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public SuccessResponse resetPassword(ForgotPassword forgotPassword) {
-        User user = userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+    public PasswordResetResponse resetPassword(ForgotPassword forgotPassword) {
 
-        String encodePassword= passwordEncoder.encode(forgotPassword.getNewPassword());
-        user.setPassword(encodePassword);
+        User u =  userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(()-> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
 
-        forgotPassword.setNewPassword(encodePassword);
+        String role = u.getRole();
 
-
-        userRepository.save(user);
-
-        return userClient.forgotPassword(forgotPassword).getBody();
+        String email = forgotPassword.getEmail();
+        String newPassword = forgotPassword.getNewPassword();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        forgotPassword.setNewPassword(encodedPassword);
+        String status;
+        String message;
+        try {
+            if ("driver".equalsIgnoreCase(role)) {
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Driver with that email does not exist."));
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+                driverClient.forgotPassword(forgotPassword);
+                status = "success";
+                message = "Driver password reset successfully";
+            } else {
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+                userClient.forgotPassword(forgotPassword);
+                status = "success";
+                message = "User password reset successfully";
+            }
+        } catch (Exception e) {
+            status = "error";
+            message = e.getMessage();
+        }
+        return new PasswordResetResponse(status, message, LocalDateTime.now());
     }
 
     @Override
@@ -143,4 +166,3 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return jwtTokenProvider.validateToken(token.substring(7));
     }
 }
-

@@ -22,7 +22,7 @@ public interface UserClient {
     @DeleteMapping("/api/users/delete/{email}")
     public ResponseEntity<String> deleteUser(@PathVariable("email") String email);
 
-    @PutMapping("/forgot-password")
+    @PutMapping("/api/users/forgot-password")
     public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword);
 
 

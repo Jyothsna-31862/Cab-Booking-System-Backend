@@ -36,7 +36,7 @@ public class AuthenticationController {
     }
 
     @PutMapping("/forgot-password")
-    public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword){
+    public ResponseEntity<PasswordResetResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword){
 
         return ResponseEntity.ok(authenticationService.resetPassword(forgotPassword));
     }
