@@ -179,5 +179,38 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 
-}
+	@Override
+	public PaymentDto updatePaymentStatus(String paymentId, String status) {
+		log.info("Attempting to update payment status for ID: {} to status: {}", paymentId, status);
 
+		// Validate status
+		if (status == null || status.trim().isEmpty()) {
+			log.error("Status cannot be null or empty for payment ID: {}", paymentId);
+			throw new IllegalArgumentException("Payment status cannot be null or empty.");
+		}
+
+		// Find the payment
+		Optional<Payment> paymentOptional = paymentRepository.findById(paymentId);
+
+		if (paymentOptional.isPresent()) {
+			Payment payment = paymentOptional.get();
+			String oldStatus = payment.getStatus();
+
+			// Update the status
+			payment.setStatus(status);
+
+			try {
+				Payment updatedPayment = paymentRepository.save(payment);
+				log.info("Successfully updated payment ID: {} from status '{}' to '{}'", paymentId, oldStatus, status);
+				return modelMapper.map(updatedPayment, PaymentDto.class);
+			} catch (Exception e) {
+				log.error("Failed to save updated payment status for ID: {}", paymentId, e);
+				throw new RuntimeException("Failed to update payment status.", e);
+			}
+		} else {
+			log.warn("Payment with ID {} not found for status update.", paymentId);
+			throw new PaymentNotFoundException("Payment with ID " + paymentId + " not found.");
+		}
+	}
+
+}

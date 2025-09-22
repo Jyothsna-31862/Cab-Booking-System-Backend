@@ -13,4 +13,5 @@ public interface PaymentService {
     PaymentDto createPayment(PaymentDto paymentDto);   
     PaymentDto getPaymentById(String paymentId);
     byte[] generateReceiptPdf(PaymentDto paymentDto);
+    PaymentDto updatePaymentStatus(String paymentId, String status);
 }

@@ -1,5 +1,6 @@
 package com.cabbooking.paymentservice.controller;
 
+import java.util.Map;
 import java.util.Optional;
 
 import com.cabbooking.paymentservice.dto.ApiResponse;
@@ -40,7 +41,7 @@ public class PaymentController {
 	}
 
 	@GetMapping("/receipt/{paymentId}")
-		public ResponseEntity<ByteArrayResource> generateReceipt(@PathVariable String paymentId) {
+	public ResponseEntity<ByteArrayResource> generateReceipt(@PathVariable String paymentId) {
 		try {
 			PaymentDto paymentDto = paymentService.getPaymentById(paymentId);
 
@@ -54,8 +55,63 @@ public class PaymentController {
 		catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
-
 	}
 
+	/**
+	 * API to update payment status
+	 * PUT /api/payments/{paymentId}/status
+	 */
+	@PutMapping("/{paymentId}/status")
+	public ResponseEntity<ApiResponse> updatePaymentStatus(
+			@PathVariable String paymentId,
+			@RequestBody Map<String, String> statusUpdate) {
 
+		try {
+			String newStatus = statusUpdate.get("status");
+			if (newStatus == null || newStatus.trim().isEmpty()) {
+				ApiResponse errorResponse = new ApiResponse("error", "Status is required", null);
+				return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+			}
+
+			PaymentDto updatedPayment = paymentService.updatePaymentStatus(paymentId, newStatus);
+			ApiResponse apiResponse = new ApiResponse("success",
+					"Payment status updated successfully to: " + newStatus, updatedPayment);
+
+			return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+
+		} catch (IllegalArgumentException e) {
+			ApiResponse errorResponse = new ApiResponse("error", e.getMessage(), null);
+			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+
+		} catch (Exception e) {
+			ApiResponse errorResponse = new ApiResponse("error", "Failed to update payment status", null);
+			return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/**
+	 * Alternative API to update payment status using query parameter
+	 * PATCH /api/payments/{paymentId}/status?status={newStatus}
+	 */
+	@PatchMapping("/{paymentId}/status")
+	public ResponseEntity<ApiResponse> updatePaymentStatusWithParam(
+			@PathVariable String paymentId,
+			@RequestParam String status) {
+
+		try {
+			PaymentDto updatedPayment = paymentService.updatePaymentStatus(paymentId, status);
+			ApiResponse apiResponse = new ApiResponse("success",
+					"Payment status updated successfully to: " + status, updatedPayment);
+
+			return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+
+		} catch (IllegalArgumentException e) {
+			ApiResponse errorResponse = new ApiResponse("error", e.getMessage(), null);
+			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+
+		} catch (Exception e) {
+			ApiResponse errorResponse = new ApiResponse("error", "Failed to update payment status", null);
+			return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
