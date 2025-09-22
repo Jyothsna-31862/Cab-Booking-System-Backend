@@ -25,10 +25,9 @@ public class Rating {
 
     private Integer driverId;
 
-    private Byte score;
-    private String comments;
+    private Integer score;
+    private String feedback;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
-

@@ -14,6 +14,6 @@ public class RatingDTO {
     private Integer rideId;
     private Integer userId;
     private Integer driverId;
-    private Byte score;
-    private String comments;
+    private Integer score;
+    private String feedback;
 }
