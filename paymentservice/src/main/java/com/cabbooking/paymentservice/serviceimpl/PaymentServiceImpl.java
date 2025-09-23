@@ -125,6 +125,11 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public byte[] generateReceiptPdf(PaymentDto paymentDto) {
+		// Check for null payment FIRST - this is what test case 9 expects
+		if (paymentDto == null) {
+			throw new IllegalArgumentException("Payment details cannot be null");
+		}
+
 		log.info("Generating invoice for payment Id: {}", paymentDto.getPaymentId());
 		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			Document document = new Document();
@@ -156,7 +161,6 @@ public class PaymentServiceImpl implements PaymentService {
 			table.addCell(paymentDto.getStatus());
 
 			document.add(table);
-
 			document.add(new Paragraph("Thank you for your payment!",
 					new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD)));
 
