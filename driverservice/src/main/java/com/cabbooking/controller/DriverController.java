@@ -25,16 +25,13 @@ public class DriverController {
     @GetMapping("/{id}")
     public ResponseEntity<DriverDto> getUserById(@PathVariable("id") String id) throws DriverNotFoundException {
 
-        DriverDto DriverById = driverService.getDriverById(id);
-        log.info("Fetched driver with ID: {}", DriverById);
-        return new ResponseEntity<>(DriverById, HttpStatus.OK);
+        return new ResponseEntity<>(driverService.getDriverById(id), HttpStatus.OK);
 
     }
 
 
     @PostMapping("/register")
     public ResponseEntity<DriverServiceResponse> registerDriver(@RequestBody DriverRequest driver) {
-        System.out.println("Received driver object: " + driver);
         DriverServiceResponse newDriver = driverService.registerDriver(driver);
         return new ResponseEntity<>(newDriver, HttpStatus.CREATED);
     }
@@ -53,8 +50,9 @@ public class DriverController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
-    @PostMapping("/forgot-password")
+    @PutMapping("/forgot-password")
     public ResponseEntity<DriverServiceResponse> forgotPassword(@RequestBody PasswordResetRequest request) {
+        log.info("email: {}, newPassword: {}", request.getEmail(), request.getNewPassword());
         DriverServiceResponse response = driverService.forgotPassword(request.getEmail(),request.getNewPassword());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
