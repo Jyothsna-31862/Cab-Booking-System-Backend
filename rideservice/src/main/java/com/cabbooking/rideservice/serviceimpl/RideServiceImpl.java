@@ -1,4 +1,4 @@
-package com.cabbooking.rideservice.serviceImpl;
+package com.cabbooking.rideservice.serviceimpl;
 
 import com.cabbooking.rideservice.dto.CancelDto;
 import com.cabbooking.rideservice.dto.RideDto;

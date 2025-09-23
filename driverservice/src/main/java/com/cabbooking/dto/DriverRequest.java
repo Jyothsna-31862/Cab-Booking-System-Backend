@@ -13,7 +13,6 @@ public class DriverRequest {
     private String gender;
     private String vehicleNumber;
     private String vehicleName;
-    private int carSeater;
-    
+    private String carSeater;  // Changed from int to String to match Driver entity
 
 }
