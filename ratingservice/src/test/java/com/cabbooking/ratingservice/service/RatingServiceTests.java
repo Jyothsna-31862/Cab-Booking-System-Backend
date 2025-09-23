@@ -71,7 +71,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("1️⃣ createRating() should return RatingDTO when valid data provided")
+    @DisplayName("createRating() should return RatingDTO when valid data provided")
     void createRating_shouldReturnRatingDTO_whenValidDataProvided() {
         when(modelMapper.map(testRatingDTO, Rating.class)).thenReturn(testRatingEntity);
         when(ratingRepository.save(any(Rating.class))).thenReturn(testRatingEntity);
@@ -94,7 +94,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("2️⃣ createRating() should throw InvalidRatingException when score is below minimum")
+    @DisplayName("createRating() should throw InvalidRatingException when score is below minimum")
     void createRating_shouldThrowInvalidRatingException_whenScoreBelowMinimum() {
         testRatingDTO.setScore((byte) 0);
 
@@ -109,7 +109,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("3️⃣ createRating() should throw InvalidRatingException when score is above maximum")
+    @DisplayName("createRating() should throw InvalidRatingException when score is above maximum")
     void createRating_shouldThrowInvalidRatingException_whenScoreAboveMaximum() {
         testRatingDTO.setScore((byte) 6);
 
@@ -124,7 +124,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("4️⃣ createRating() should throw InvalidRatingException when score is null")
+    @DisplayName("createRating() should throw InvalidRatingException when score is null")
     void createRating_shouldThrowInvalidRatingException_whenScoreIsNull() {
         testRatingDTO.setScore(null);
 
@@ -139,7 +139,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("5️⃣ createRating() should accept all valid scores from 1 to 5")
+    @DisplayName("createRating() should accept all valid scores from 1 to 5")
     void createRating_shouldAcceptAllValidScores_fromOneToFive() {
         when(modelMapper.map(any(RatingDTO.class), eq(Rating.class))).thenReturn(testRatingEntity);
         when(ratingRepository.save(any(Rating.class))).thenReturn(testRatingEntity);
@@ -160,7 +160,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("6️⃣ createRating() should handle empty comments successfully")
+    @DisplayName("createRating() should handle empty comments successfully")
     void createRating_shouldHandleEmptyComments_successfully() {
         testRatingDTO.setComments("");
         testRatingEntity.setFeedback("");
@@ -180,7 +180,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("7️⃣ createRating() should handle driver service failure gracefully")
+    @DisplayName("createRating() should handle driver service failure gracefully")
     void createRating_shouldHandleDriverServiceFailure_gracefully() {
         when(modelMapper.map(testRatingDTO, Rating.class)).thenReturn(testRatingEntity);
         when(ratingRepository.save(any(Rating.class))).thenReturn(testRatingEntity);
@@ -199,7 +199,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("8️⃣ createRating() should throw RuntimeException when repository save fails")
+    @DisplayName("createRating() should throw RuntimeException when repository save fails")
     void createRating_shouldThrowRuntimeException_whenRepositorySaveFails() {
         when(modelMapper.map(testRatingDTO, Rating.class)).thenReturn(testRatingEntity);
         when(ratingRepository.save(any(Rating.class)))
@@ -216,7 +216,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("9️⃣ getAverageRatingForDriver() should return average rating when ratings exist")
+    @DisplayName("getAverageRatingForDriver() should return average rating when ratings exist")
     void getAverageRatingForDriver_shouldReturnAverageRating_whenRatingsExist() {
         Integer driverId = 200;
         Double expectedAverage = 4.5;
@@ -229,7 +229,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("🔟 getAverageRatingForDriver() should return 0.0 when no ratings exist")
+    @DisplayName("getAverageRatingForDriver() should return 0.0 when no ratings exist")
     void getAverageRatingForDriver_shouldReturnZero_whenNoRatingsExist() {
         Integer driverId = 200;
         when(ratingRepository.findAverageRatingByDriverId(driverId)).thenReturn(null);
@@ -241,7 +241,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("1️⃣1️⃣ getAverageRatingForDriver() should handle different driver IDs correctly")
+    @DisplayName("getAverageRatingForDriver() should handle different driver IDs correctly")
     void getAverageRatingForDriver_shouldHandleDifferentDriverIds_correctly() {
         Integer[] driverIds = {100, 200, 300, 999};
         Double[] expectedAverages = {4.0, 4.5, 3.8, null};
@@ -265,7 +265,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("1️⃣2️⃣ getRatingById() should return RatingDTO when rating exists")
+    @DisplayName("getRatingById() should return RatingDTO when rating exists")
     void getRatingById_shouldReturnRatingDTO_whenRatingExists() {
         Integer rideId = 100;
         when(ratingRepository.findByRideId(rideId)).thenReturn(Optional.of(testRatingEntity));
@@ -282,7 +282,7 @@ class RatingServiceTests {
     }
 
     @Test
-    @DisplayName("1️⃣3️⃣ getRatingById() should return empty Optional when rating not found")
+    @DisplayName(" getRatingById() should return empty Optional when rating not found")
     void getRatingById_shouldReturnEmptyOptional_whenRatingNotFound() {
         Integer rideId = 999;
         when(ratingRepository.findByRideId(rideId)).thenReturn(Optional.empty());

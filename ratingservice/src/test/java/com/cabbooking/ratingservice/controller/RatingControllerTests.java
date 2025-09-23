@@ -51,7 +51,7 @@ class RatingControllerTests {
     }
 
     @Test
-    @DisplayName("1️⃣ createRating() should return CREATED and RatingDTO")
+    @DisplayName("createRating() should return CREATED and RatingDTO")
     void createRating_returnsCreatedAndRatingDto() {
         when(ratingService.createRating(testRatingDTO)).thenReturn(testRatingDTO);
 
@@ -62,7 +62,7 @@ class RatingControllerTests {
     }
 
     @Test
-    @DisplayName("2️⃣ getRatingByRideId() should return OK and RatingDTO when rating exists")
+    @DisplayName("getRatingByRideId() should return OK and RatingDTO when rating exists")
     void getRatingByRideId_returnsOkAndRatingDto_whenRatingExists() {
         Integer rideId = 100;
         when(ratingService.getRatingById(rideId)).thenReturn(Optional.of(testRatingDTO));
@@ -74,7 +74,7 @@ class RatingControllerTests {
     }
 
     @Test
-    @DisplayName("3️⃣ getRatingByRideId() should return NOT_FOUND when rating does not exist")
+    @DisplayName("getRatingByRideId() should return NOT_FOUND when rating does not exist")
     void getRatingByRideId_returnsNotFound_whenRatingDoesNotExist() {
         Integer rideId = 999;
         when(ratingService.getRatingById(rideId)).thenReturn(Optional.empty());
@@ -85,7 +85,7 @@ class RatingControllerTests {
     }
 
     @Test
-    @DisplayName("4️⃣ getAverageRatingForDriver() should return OK and average rating")
+    @DisplayName("getAverageRatingForDriver() should return OK and average rating")
     void getAverageRatingForDriver_returnsOkAndAverageRating() {
         Integer driverId = 200;
         Double expectedAverage = 4.5;
@@ -98,7 +98,7 @@ class RatingControllerTests {
     }
 
     @Test
-    @DisplayName("5️⃣ getAverageRatingForDriver() should return OK and 0.0 when no ratings exist")
+    @DisplayName("getAverageRatingForDriver() should return OK and 0.0 when no ratings exist")
     void getAverageRatingForDriver_returnsOkAndZero_whenNoRatingsExist() {
         Integer driverId = 300;
         when(ratingService.getAverageRatingForDriver(driverId)).thenReturn(0.0);
