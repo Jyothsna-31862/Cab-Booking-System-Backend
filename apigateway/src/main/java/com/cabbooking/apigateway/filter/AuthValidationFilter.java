@@ -47,12 +47,12 @@ public class AuthValidationFilter implements Filter {
         String method = httpRequest.getMethod();
 
         if (log.isDebugEnabled()) {
-            log.debug("[AUTH-FILTER] Incoming request method={} path={}", method, requestPath);
+            log.debug("Incoming request method={} path={}", method, requestPath);
         }
 
         if ("OPTIONS".equalsIgnoreCase(method) || isPublicUrl(requestPath)) {
             if (log.isDebugEnabled()) {
-                log.debug("[AUTH-FILTER] Skipping auth for public/OPTIONS path={}", requestPath);
+                log.debug("Skipping auth for public/OPTIONS path={}", requestPath);
             }
             chain.doFilter(request, response);
             return;
@@ -60,14 +60,14 @@ public class AuthValidationFilter implements Filter {
 
         String authHeader = httpRequest.getHeader("Authorization");
         if (!StringUtils.hasText(authHeader)) {
-            log.warn("[AUTH-FILTER] Missing Authorization header for protected path={}", requestPath);
+            log.warn("Missing Authorization header for protected path={}", requestPath);
             sendError(httpResponse, HttpStatus.UNAUTHORIZED, "Missing Authorization header");
             return;
         }
 
         authHeader = authHeader.trim();
         if (!authHeader.startsWith("Bearer ")) {
-            log.warn("[AUTH-FILTER] Invalid Authorization format for path={} headerPreview={}...", requestPath,
+            log.warn("Invalid Authorization format for path={} headerPreview={}...", requestPath,
                     authHeader.substring(0, Math.min(15, authHeader.length())));
             sendError(httpResponse, HttpStatus.UNAUTHORIZED, "Invalid Authorization header format. Expected: Bearer <token>");
             return;
@@ -75,7 +75,7 @@ public class AuthValidationFilter implements Filter {
 
         String token = authHeader.substring(7).trim();
         if (token.isEmpty()) {
-            log.warn("[AUTH-FILTER] Empty token for path={}", requestPath);
+            log.warn("Empty token for path={}", requestPath);
             sendError(httpResponse, HttpStatus.UNAUTHORIZED, "Empty token in Authorization header");
             return;
         }
@@ -83,14 +83,14 @@ public class AuthValidationFilter implements Filter {
         try {
             Boolean isValid = authServiceClient.validateToken("Bearer " + token);
             if (Boolean.TRUE.equals(isValid)) {
-                log.info("[AUTH-FILTER] Token valid path={}", requestPath);
+                log.info("Token valid path={}", requestPath);
                 chain.doFilter(request, response);
             } else {
-                log.warn("[AUTH-FILTER] Token invalid path={}", requestPath);
+                log.warn("Token invalid path={}", requestPath);
                 sendError(httpResponse, HttpStatus.UNAUTHORIZED, "Invalid token");
             }
         } catch (Exception ex) {
-            log.error("[AUTH-FILTER] Exception during token validation path={} msg={}", requestPath, ex.getMessage());
+            log.error("Exception during token validation path={} msg={}", requestPath, ex.getMessage());
             sendError(httpResponse, HttpStatus.UNAUTHORIZED, "Token validation failed");
         }
     }
@@ -98,7 +98,7 @@ public class AuthValidationFilter implements Filter {
     private boolean isPublicUrl(String requestPath) {
         for (String pattern : PUBLIC_PATTERNS) {
             if (PATH_MATCHER.match(pattern, requestPath)) {
-                log.info("[AUTH-FILTER] Public match pattern={} path={}", pattern, requestPath);
+                log.info("Public match pattern={} path={}", pattern, requestPath);
                 return true;
             }
         }
