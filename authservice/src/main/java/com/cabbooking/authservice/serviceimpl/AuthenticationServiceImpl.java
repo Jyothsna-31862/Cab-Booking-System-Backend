@@ -71,6 +71,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserServiceResponse registerUser(UserRequest userRequest) {
 
+
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + userRequest.getEmail());
+        }
+
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
         userRequest.setPassword(hashedPassword);
 
@@ -92,6 +97,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public DriverServiceResponse registerDriver(DriverRequest driverRequest) {
+
+        if(userRepository.existsByEmail(driverRequest.getEmail())) {
+            throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + driverRequest.getEmail());
+        }
 
         String hashedPassword = passwordEncoder.encode(driverRequest.getPassword());
         driverRequest.setPassword(hashedPassword);
