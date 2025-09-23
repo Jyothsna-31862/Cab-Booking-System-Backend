@@ -25,6 +25,6 @@ public interface DriverRepository extends JpaRepository<Driver, String> {
 
     @Query("SELECT d FROM Driver d WHERE d.isAvailable = true AND d.carSeater = :carSr")
         // Correct method name - Spring Data JPA will interpret this as: isAvailable = true AND carSeater = ?
-    Optional<Driver> findFirstByIsAvailableAndCarSeater(boolean isAvailable, String carSeater);
+    Optional<Driver> findFirstByIsAvailableAndCarSeater(boolean isAvailable, String carSr);
 
 }
