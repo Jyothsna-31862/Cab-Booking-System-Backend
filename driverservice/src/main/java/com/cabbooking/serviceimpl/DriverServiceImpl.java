@@ -117,11 +117,11 @@ public class DriverServiceImpl implements DriverService {
     }
    
     public DriverDto getAvailableDrivers(String carSr) {
-            log.info("Getting first available driver");
-            Driver availableDriver = driverRepository.findAvailableDriverWithCarSeater(carSr)
+            log.info("Getting first available driver with car seater: {}", carSr);
+            Driver availableDriver = driverRepository.findFirstByIsAvailableAndCarSeater(true, carSr)
                     .orElseThrow(() -> {
-                        log.warn("No available drivers found");
-                        return new DriverNotFoundException("No available drivers found");
+                        log.warn("No available drivers found for car seater: {}", carSr);
+                        return new DriverNotFoundException("No available drivers found for car seater: " + carSr);
                     });
             return modelMapper.map(availableDriver, DriverDto.class);
     }
