@@ -1,6 +1,7 @@
 package com.cabbooking.userservice.service;
 
 import com.cabbooking.userservice.config.MapperConfig;
+import com.cabbooking.userservice.dto.ForgotPassword;
 import com.cabbooking.userservice.dto.UserDto;
 import com.cabbooking.userservice.dto.UserRequest;
 import com.cabbooking.userservice.dto.UserServiceResponse;
@@ -135,6 +136,20 @@ public class UserServiceImpl implements UserService {
 
         }
         return new SuccessResponse("success","Code verified successfully." );
+    }
+
+    @Override
+    public SuccessResponse forgotPassword(ForgotPassword forgotPassword) throws UserNotFoundException {
+        User user = userRepository.findByEmail(forgotPassword.getEmail())
+                .orElseThrow(() -> {
+                    log.error("User not found with email: {}", forgotPassword.getEmail());
+                    return new UserNotFoundException("User with email " + forgotPassword.getEmail() + " not found");
+                });
+
+        user.setPassword(forgotPassword.getNewPassword());
+        userRepository.save(user);
+        log.info("Password updated successfully for user with email: {}", forgotPassword.getEmail());
+        return new SuccessResponse("success","Password updated successfully." );
     }
 
 }

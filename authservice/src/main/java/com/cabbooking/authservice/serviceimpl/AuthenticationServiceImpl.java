@@ -44,6 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             ));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             JwtResponse jwtResponse = new JwtResponse();
+            log.info("Authentication successful for email: {}", loginDto.getEmail());
             User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
             log.info("User found: {}", user);
             if (user.getRole().equalsIgnoreCase("driver")) {
@@ -62,12 +63,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return jwtResponse;
 
         } catch (Exception e) {
+            log.info("Error during authentication for email: {}: {}", loginDto.getEmail(), e.getMessage());
             throw new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
     }
 
     @Override
     public UserServiceResponse registerUser(UserRequest userRequest) {
+
+
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + userRequest.getEmail());
+        }
 
         String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
         userRequest.setPassword(hashedPassword);
@@ -91,6 +98,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public DriverServiceResponse registerDriver(DriverRequest driverRequest) {
 
+        if(userRepository.existsByEmail(driverRequest.getEmail())) {
+            throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + driverRequest.getEmail());
+        }
+
         String hashedPassword = passwordEncoder.encode(driverRequest.getPassword());
         driverRequest.setPassword(hashedPassword);
 
@@ -111,15 +122,39 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public String resetPassword(ForgotPassword forgotPassword) {
-        User user = userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+    public PasswordResetResponse resetPassword(ForgotPassword forgotPassword) {
 
+        User u =  userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(()-> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
 
-        user.setPassword(passwordEncoder.encode(forgotPassword.getNewPassword()));
+        String role = u.getRole();
 
-        userRepository.save(user);
-
-        return "Password has been reset successfully.";
+        String email = forgotPassword.getEmail();
+        String newPassword = forgotPassword.getNewPassword();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        forgotPassword.setNewPassword(encodedPassword);
+        String status;
+        String message;
+        try {
+            if ("driver".equalsIgnoreCase(role)) {
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Driver with that email does not exist."));
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+                driverClient.forgotPassword(forgotPassword);
+                status = "success";
+                message = "Driver password reset successfully";
+            } else {
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+                userClient.forgotPassword(forgotPassword);
+                status = "success";
+                message = "User password reset successfully";
+            }
+        } catch (Exception e) {
+            status = "error";
+            message = e.getMessage();
+        }
+        return new PasswordResetResponse(status, message, LocalDateTime.now());
     }
 
     @Override
@@ -136,13 +171,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthResponse validateToken(ValidateTokenRequest tokenRequest) {
-        jwtTokenProvider.validateToken(tokenRequest.getToken());
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setStatus("success");
-        authResponse.setMessage("Token is valid");
-        authResponse.setTimeStamp(LocalDateTime.now());
-        return authResponse;
+    public Boolean validateToken(String token) {
+        return jwtTokenProvider.validateToken(token.substring(7));
     }
 }
-

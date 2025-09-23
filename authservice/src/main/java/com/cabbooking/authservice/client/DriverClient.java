@@ -1,25 +1,21 @@
 package com.cabbooking.authservice.client;
 
-import com.cabbooking.authservice.dto.DriverDto;
-import com.cabbooking.authservice.dto.DriverRequest;
-import com.cabbooking.authservice.dto.DriverServiceResponse;
+import com.cabbooking.authservice.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(
-        name = "driver-service",
-        url = "http://localhost:8081/api/drivers"
+        name = "DRIVER-SERVICE"
 )
 public interface DriverClient {
 
-    @PostMapping("/register")
+    @PostMapping("/api/drivers/register")
     public ResponseEntity<DriverServiceResponse> registerDriver(@RequestBody DriverRequest driver);
 
-    @GetMapping("/email/{email}")
+    @GetMapping("/api/drivers/email/{email}")
     public ResponseEntity<DriverDto> getDriverByEmail(@PathVariable("email") String email);
+
+    @PutMapping("/api/drivers/forgot-password")
+    public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword);
 }

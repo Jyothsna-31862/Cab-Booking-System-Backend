@@ -5,7 +5,7 @@ import com.cabbooking.ratingservice.entity.Rating;
 import com.cabbooking.ratingservice.repository.RatingRepository;
 import com.cabbooking.ratingservice.service.RatingService;
 import com.cabbooking.ratingservice.exception.InvalidRatingException;
-import com.cabbooking.ratingservice.client.DriverServiceClient;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -14,16 +14,12 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class RatingServiceImpl implements RatingService {
     private final RatingRepository ratingRepository;
     private final ModelMapper modelMapper;
-    private final DriverServiceClient driverServiceClient;
 
-    public RatingServiceImpl(RatingRepository ratingRepository, ModelMapper modelMapper, DriverServiceClient driverServiceClient) {
-        this.ratingRepository = ratingRepository;
-        this.modelMapper = modelMapper;
-        this.driverServiceClient = driverServiceClient;
-    }
+
 
     @Override
     public RatingDTO createRating(RatingDTO ratingDTO) {
@@ -60,8 +56,6 @@ public class RatingServiceImpl implements RatingService {
             // Calculate new average rating for the driver
             Double newAverageRating = getAverageRatingForDriver(driverId);
 
-            // Call driver service to update the rating directly
-            driverServiceClient.updateDriverRating(driverId.toString(), newAverageRating);
 
             log.info("Successfully updated driver {} with new average rating: {}", driverId, newAverageRating);
 

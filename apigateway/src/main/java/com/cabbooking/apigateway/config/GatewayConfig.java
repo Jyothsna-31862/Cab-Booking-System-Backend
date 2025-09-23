@@ -1,55 +1,50 @@
 package com.cabbooking.apigateway.config;
 
-import com.cabbooking.apigateway.filter.AuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.route.RouteLocator;
-import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import com.cabbooking.apigateway.filter.AuthValidationFilter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class GatewayConfig {
 
-    @Autowired
-    private AuthenticationFilter authenticationFilter;
+    private final AuthValidationFilter authValidationFilter;
+
+    // Highest precedence CORS filter so preflight responses include headers BEFORE auth filter runs
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+
+        config.setAllowCredentials(true);
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization","Content-Type","Accept","Origin","X-Requested-With","Access-Control-Request-Method","Access-Control-Request-Headers"));
+        config.setExposedHeaders(List.of("Authorization","Content-Type"));
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
 
     @Bean
-    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes()
-                // Auth Service Routes (Public - no authentication needed)
-                .route("auth-service", r -> r.path("/api/auth/**")
-                        .uri("lb://AUTH-SERVICE"))
-
-                // User Service Routes (Protected)
-                .route("user-service", r -> r.path("/api/users/**")
-                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                        .uri("lb://USER-SERVICE"))
-
-                // Driver Service Routes (Protected)
-                .route("driver-service", r -> r.path("/api/drivers/**")
-                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                        .uri("lb://DRIVER-SERVICE"))
-
-                // Ride Service Routes (Protected)
-                .route("ride-service", r -> r.path("/api/rides/**")
-                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                        .uri("lb://RIDE-SERVICE"))
-
-                // Rating Service Routes (Protected)
-                .route("rating-service", r -> r.path("/api/ratings/**")
-                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                        .uri("lb://RATING-SERVICE"))
-
-                // Location Service Routes (Protected)
-                .route("location-service", r -> r.path("/api/locations/**")
-                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                        .uri("lb://LOCATION-SERVICE"))
-
-                // Payment Service Routes (Protected)
-                .route("payment-service", r -> r.path("/api/payments/**")
-                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-                        .uri("lb://PAYMENT-SERVICE"))
-
-                .build();
+    public FilterRegistrationBean<AuthValidationFilter> authFilterRegistration() {
+        FilterRegistrationBean<AuthValidationFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(authValidationFilter);
+        registrationBean.addUrlPatterns("/*");
+        // Run after CORS filter so OPTIONS is handled cleanly
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        return registrationBean;
     }
 }

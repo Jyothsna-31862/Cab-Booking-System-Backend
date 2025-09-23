@@ -1,4 +1,4 @@
-package com.cabbooking.rideservice.serviceImpl;
+package com.cabbooking.rideservice.serviceimpl;
 
 import com.cabbooking.rideservice.dto.CancelDto;
 import com.cabbooking.rideservice.dto.RideDto;
@@ -62,7 +62,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public ArrayList<RideDto> getAllUserRides(String userId) {
-        ArrayList<Ride> rides = rideRepository.findAllByUserId(userId);
+        ArrayList<Ride> rides = rideRepository.findAllByUserIdOrderByBookingDateDescBookingTimeDesc(userId);
         return rides.stream()
                 .map(ride -> modelMapper.map(ride, RideDto.class))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -70,7 +70,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public ArrayList<RideDto> getAllDriverRides(String driverId) {
-        ArrayList<Ride> rides = rideRepository.findAllByDriverId(driverId);
+        ArrayList<Ride> rides = rideRepository.findAllByDriverIdOrderByBookingDateDescBookingTimeDesc(driverId);
         return rides.stream()
                 .map(ride -> modelMapper.map(ride,RideDto.class))
                 .collect(Collectors.toCollection(ArrayList::new));

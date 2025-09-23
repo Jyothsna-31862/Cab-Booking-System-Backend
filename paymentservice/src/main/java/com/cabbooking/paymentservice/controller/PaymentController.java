@@ -41,7 +41,7 @@ public class PaymentController {
 	}
 
 	@GetMapping("/receipt/{paymentId}")
-	public ResponseEntity<ByteArrayResource> generateReceipt(@PathVariable String paymentId) {
+		public ResponseEntity<ByteArrayResource> generateReceipt(@PathVariable String paymentId) {
 		try {
 			PaymentDto paymentDto = paymentService.getPaymentById(paymentId);
 

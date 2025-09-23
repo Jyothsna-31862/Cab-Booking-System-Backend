@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200/")
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
@@ -37,9 +36,9 @@ public class AuthenticationController {
     }
 
     @PutMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPassword forgotPassword){
-        String s = authenticationService.resetPassword(forgotPassword);
-        return ResponseEntity.ok(s);
+    public ResponseEntity<PasswordResetResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword){
+
+        return ResponseEntity.ok(authenticationService.resetPassword(forgotPassword));
     }
 
     @DeleteMapping("/delete/{email}")
@@ -49,10 +48,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(s);
     }
 
-    @PostMapping("/validate-token")
-    public ResponseEntity<AuthResponse> validateToken(@RequestBody ValidateTokenRequest tokenRequest){
-        AuthResponse response = authenticationService.validateToken(tokenRequest);
-        return ResponseEntity.ok(response);
+    @GetMapping("/validate")
+    public boolean validateToken(@RequestHeader("Authorization") String token) {
+        return authenticationService.validateToken(token);
     }
 
 
