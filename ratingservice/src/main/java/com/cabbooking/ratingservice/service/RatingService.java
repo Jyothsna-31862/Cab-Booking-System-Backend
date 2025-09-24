@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface RatingService {
      RatingDTO createRating(RatingDTO ratingDTO);
-     Double getAverageRatingForDriver(Integer driverId);
-     Optional<RatingDTO> getRatingById(Integer rideId);
+     Double getAverageRatingForDriver(String driverId);
+     Optional<RatingDTO> getRatingById(String rideId);
 }

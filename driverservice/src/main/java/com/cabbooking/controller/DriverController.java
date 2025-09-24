@@ -44,10 +44,11 @@ public class DriverController {
         return new ResponseEntity<>(updatedDriver, HttpStatus.OK);
     }
     
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDriver(@PathVariable("id") String id) throws DriverNotFoundException {
-        driverService.deleteDriver(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @DeleteMapping("/{email}")
+    public ResponseEntity<String> deleteDriver(@PathVariable("email") String email) throws DriverNotFoundException {
+        String response = driverService.deleteDriver(email);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @PutMapping("/forgot-password")

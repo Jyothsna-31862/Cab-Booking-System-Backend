@@ -19,20 +19,21 @@ public class RatingController {
         this.ratingService = ratingService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<RatingDTO> createRating(@RequestBody RatingDTO ratingDTO) {
+        log.info("Received rating: {}", ratingDTO);
         RatingDTO createdRating = ratingService.createRating(ratingDTO);
         return ResponseEntity.ok(createdRating);
     }
 
-    @GetMapping("/driver/{driverId}/average")
-    public ResponseEntity<Double> getAverageRatingForDriver(@PathVariable Integer driverId) {
+    @GetMapping("/driver/{driverId}")
+    public ResponseEntity<Double> getAverageRatingForDriver(@PathVariable String driverId) {
         Double averageRating = ratingService.getAverageRatingForDriver(driverId);
         return ResponseEntity.ok(averageRating);
     }
 
     @GetMapping("/ride/{rideId}")
-    public ResponseEntity<RatingDTO> getRatingByRideId(@PathVariable Integer rideId) {
+    public ResponseEntity<RatingDTO> getRatingByRideId(@PathVariable String rideId) {
         Optional<RatingDTO> rating = ratingService.getRatingById(rideId);
         return rating.map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());

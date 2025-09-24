@@ -18,4 +18,7 @@ public interface DriverClient {
 
     @PutMapping("/api/drivers/forgot-password")
     public ResponseEntity<SuccessResponse> forgotPassword(@RequestBody ForgotPassword forgotPassword);
+
+    @DeleteMapping("/{email}")
+    public ResponseEntity<String> deleteDriver(@PathVariable("email") String email);
 }

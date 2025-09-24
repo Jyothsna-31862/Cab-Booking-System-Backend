@@ -11,9 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RatingDTO {
     private Integer ratingId;
-    private Integer rideId;
-    private Integer userId;
-    private Integer driverId;
-    private Byte score;
+    private String rideId;
+    private String userId;
+    private String driverId;
+    private Integer score;
     private String comments;
 }

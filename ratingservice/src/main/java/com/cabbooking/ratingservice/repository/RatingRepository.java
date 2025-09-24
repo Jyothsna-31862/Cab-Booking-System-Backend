@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface RatingRepository extends JpaRepository<Rating, Integer> {
     @Query("SELECT AVG(r.score) FROM Rating r WHERE r.driverId = :driverId")
-    Double findAverageRatingByDriverId(@Param("driverId") Integer driverId);
+    Double findAverageRatingByDriverId(@Param("driverId") String driverId);
 
-    Optional<Rating> findByRideId(Integer rideId);
+    Optional<Rating> findByRideId(String rideId);
 }

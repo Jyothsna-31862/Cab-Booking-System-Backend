@@ -160,15 +160,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public String deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
 
-        ResponseEntity<String> response = userClient.deleteUser(email);
+        String role = user.getRole();
+        ResponseEntity<String> response;
+
+        if ("driver".equalsIgnoreCase(role)) {
+            response = driverClient.deleteDriver(email);
+        } else {
+            response = userClient.deleteUser(email);
+        }
 
         if (response.getStatusCode() == HttpStatus.OK) {
             userRepository.deleteByEmail(email);
         }
         return response.getBody();
-
     }
+
 
     @Override
     public Boolean validateToken(String token) {

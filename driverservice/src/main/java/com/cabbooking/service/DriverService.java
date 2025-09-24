@@ -1,5 +1,4 @@
 package com.cabbooking.service;
-import java.util.List;
 
 import com.cabbooking.dto.DriverDto;
 import com.cabbooking.dto.DriverRequest;
@@ -14,7 +13,7 @@ public interface DriverService {
 
 
     DriverDto updateDriverProfile(String id, DriverRequest driverRequest) throws DriverNotFoundException;
-    void deleteDriver(String id) throws DriverNotFoundException;
+    String deleteDriver(String email) throws DriverNotFoundException;
     DriverServiceResponse forgotPassword(String email,String newPassword);
     DriverDto updateDriverStatus(String id) throws DriverNotFoundException;
     DriverDto getAvailableDrivers(String carSeater);

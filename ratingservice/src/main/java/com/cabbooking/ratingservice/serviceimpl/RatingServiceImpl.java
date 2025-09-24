@@ -1,5 +1,6 @@
 package com.cabbooking.ratingservice.serviceimpl;
 
+import com.cabbooking.ratingservice.client.DriverClient;
 import com.cabbooking.ratingservice.dto.RatingDTO;
 import com.cabbooking.ratingservice.entity.Rating;
 import com.cabbooking.ratingservice.repository.RatingRepository;
@@ -16,10 +17,10 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class RatingServiceImpl implements RatingService {
+
     private final RatingRepository ratingRepository;
     private final ModelMapper modelMapper;
-
-
+    private final DriverClient driverClient;
 
     @Override
     public RatingDTO createRating(RatingDTO ratingDTO) {
@@ -38,8 +39,14 @@ public class RatingServiceImpl implements RatingService {
             savedRating = ratingRepository.save(rating);
             log.info("Rating successfully saved with ID: {}", savedRating.getRatingId());
 
-            // After saving rating, update driver's average rating
-            updateDriverAverageRating(savedRating.getDriverId());
+
+            Double r = getAverageRatingForDriver(ratingDTO.getDriverId());
+
+            updateDriverAverageRating(r, ratingDTO.getDriverId());
+
+            log.info("Successfully updated average rating for driver: {}", savedRating.getDriverId());
+
+
 
         } catch (Exception e) {
             log.error("Failed to save rating to the database.", e);
@@ -49,31 +56,29 @@ public class RatingServiceImpl implements RatingService {
         return modelMapper.map(savedRating, RatingDTO.class);
     }
 
-    private void updateDriverAverageRating(Integer driverId) {
+    private void updateDriverAverageRating(Double rating, String driverId) {
         try {
             log.info("Updating average rating for driver: {}", driverId);
 
-            // Calculate new average rating for the driver
-            Double newAverageRating = getAverageRatingForDriver(driverId);
 
+            driverClient.updateDriverRating(driverId, rating);
 
-            log.info("Successfully updated driver {} with new average rating: {}", driverId, newAverageRating);
+            log.info("Successfully updated driver {} with new average rating: {}", driverId, rating);
 
         } catch (Exception e) {
             log.error("Failed to update driver average rating for driver {}: {}", driverId, e.getMessage());
-            // Don't fail the rating creation if driver update fails
         }
     }
 
     @Override
-    public Double getAverageRatingForDriver(Integer driverId) {
+    public Double getAverageRatingForDriver(String driverId) {
         Double averageRating = ratingRepository.findAverageRatingByDriverId(driverId);
         log.info("Calculated average rating for driverId {}: {}", driverId, averageRating);
         return averageRating != null ? averageRating : 0.0;
     }
 
     @Override
-    public Optional<RatingDTO> getRatingById(Integer rideId) {
+    public Optional<RatingDTO> getRatingById(String rideId) {
         log.info("Attempting to retrieve rating for rideId: {}", rideId);
         Optional<Rating> ratingOptional = ratingRepository.findByRideId(rideId);
 

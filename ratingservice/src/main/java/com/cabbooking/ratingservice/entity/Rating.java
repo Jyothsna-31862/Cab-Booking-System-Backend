@@ -19,11 +19,11 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ratingId;
 
-    private Integer rideId;
+    private String rideId;
 
-    private Integer userId;
+    private String userId;
 
-    private Integer driverId;
+    private String driverId;
 
     private Integer score;
     private String feedback;

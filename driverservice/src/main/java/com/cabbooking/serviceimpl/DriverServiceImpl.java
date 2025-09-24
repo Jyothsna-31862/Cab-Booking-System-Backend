@@ -58,6 +58,7 @@ public class DriverServiceImpl implements DriverService {
         Driver driver = driverRepository.findByDriverId(driverId)
                 .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + driverId + " not found"));
         driver.setRating(rating);
+        log.info("New rating set: {}", driver.getRating());
         Driver updatedDriver = driverRepository.save(driver);
         return modelMapper.map(updatedDriver, DriverDto.class);
     }
@@ -88,12 +89,13 @@ public class DriverServiceImpl implements DriverService {
         return modelMapper.map(updatedDriver, DriverDto.class);
     }
 
-    public void deleteDriver(String id) throws DriverNotFoundException {
-        log.info("Deleting driver with ID: {}", id);
-        Driver driver = driverRepository.findByDriverId(id)
-                    .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
+    public String deleteDriver(String email) throws DriverNotFoundException {
+        log.info("Deleting driver with Email: {}", email);
+        Driver driver = driverRepository.findByEmail(email)
+                    .orElseThrow(() -> new DriverNotFoundException("Driver with Email " + email + " not found"));
         driverRepository.delete(driver);
         log.info("Driver deleted successfully");
+        return "Driver Deleted Successfully";
     }
 
     public DriverServiceResponse forgotPassword(String email,String newPassword) {
