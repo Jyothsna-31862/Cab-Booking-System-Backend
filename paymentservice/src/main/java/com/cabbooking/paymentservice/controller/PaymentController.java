@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import com.cabbooking.paymentservice.dto.PaymentDto;
 import com.cabbooking.paymentservice.service.PaymentService;
 
-@CrossOrigin("http://localhost:4200/")
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -57,13 +56,10 @@ public class PaymentController {
 		}
 	}
 
-	/**
-	 * API to update payment status
-	 * PUT /api/payments/{paymentId}/status
-	 */
-	@PutMapping("/{paymentId}/status")
+
+	@PatchMapping("/{rideId}/status")
 	public ResponseEntity<ApiResponse> updatePaymentStatus(
-			@PathVariable String paymentId,
+			@PathVariable String rideId,
 			@RequestBody Map<String, String> statusUpdate) {
 
 		try {
@@ -73,7 +69,7 @@ public class PaymentController {
 				return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 			}
 
-			PaymentDto updatedPayment = paymentService.updatePaymentStatus(paymentId, newStatus);
+			PaymentDto updatedPayment = paymentService.updatePaymentStatus(rideId, newStatus);
 			ApiResponse apiResponse = new ApiResponse("success",
 					"Payment status updated successfully to: " + newStatus, updatedPayment);
 
@@ -89,29 +85,4 @@ public class PaymentController {
 		}
 	}
 
-	/**
-	 * Alternative API to update payment status using query parameter
-	 * PATCH /api/payments/{paymentId}/status?status={newStatus}
-	 */
-	@PatchMapping("/{paymentId}/status")
-	public ResponseEntity<ApiResponse> updatePaymentStatusWithParam(
-			@PathVariable String paymentId,
-			@RequestParam String status) {
-
-		try {
-			PaymentDto updatedPayment = paymentService.updatePaymentStatus(paymentId, status);
-			ApiResponse apiResponse = new ApiResponse("success",
-					"Payment status updated successfully to: " + status, updatedPayment);
-
-			return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-
-		} catch (IllegalArgumentException e) {
-			ApiResponse errorResponse = new ApiResponse("error", e.getMessage(), null);
-			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-
-		} catch (Exception e) {
-			ApiResponse errorResponse = new ApiResponse("error", "Failed to update payment status", null);
-			return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
 }

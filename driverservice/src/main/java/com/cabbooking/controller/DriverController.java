@@ -65,7 +65,7 @@ public class DriverController {
         return new ResponseEntity<>(availableDrivers, HttpStatus.OK);
     }
 
-    @PatchMapping("status/{id}")
+    @PatchMapping("/status/{id}")
     public ResponseEntity<DriverDto> updateAvailability(
             @PathVariable("id") String id) throws DriverNotFoundException {
       

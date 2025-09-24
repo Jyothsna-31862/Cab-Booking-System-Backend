@@ -184,17 +184,17 @@ public class PaymentServiceImpl implements PaymentService {
 
 
 	@Override
-	public PaymentDto updatePaymentStatus(String paymentId, String status) {
-		log.info("Attempting to update payment status for ID: {} to status: {}", paymentId, status);
+	public PaymentDto updatePaymentStatus(String rideId, String status) {
+		log.info("Attempting to update payment status for ID: {} to status: {}", rideId, status);
 
 		// Validate status
 		if (status == null || status.trim().isEmpty()) {
-			log.error("Status cannot be null or empty for payment ID: {}", paymentId);
+			log.error("Status cannot be null or empty for payment ID: {}", rideId);
 			throw new IllegalArgumentException("Payment status cannot be null or empty.");
 		}
 
 		// Find the payment
-		Optional<Payment> paymentOptional = paymentRepository.findById(paymentId);
+		Optional<Payment> paymentOptional = paymentRepository.findByRideId(rideId);
 
 		if (paymentOptional.isPresent()) {
 			Payment payment = paymentOptional.get();
@@ -205,15 +205,15 @@ public class PaymentServiceImpl implements PaymentService {
 
 			try {
 				Payment updatedPayment = paymentRepository.save(payment);
-				log.info("Successfully updated payment ID: {} from status '{}' to '{}'", paymentId, oldStatus, status);
+				log.info("Successfully updated payment ID: {} from status '{}' to '{}'", rideId, oldStatus, status);
 				return modelMapper.map(updatedPayment, PaymentDto.class);
 			} catch (Exception e) {
-				log.error("Failed to save updated payment status for ID: {}", paymentId, e);
+				log.error("Failed to save updated payment status for ID: {}", rideId, e);
 				throw new RuntimeException("Failed to update payment status.", e);
 			}
 		} else {
-			log.warn("Payment with ID {} not found for status update.", paymentId);
-			throw new PaymentNotFoundException("Payment with ID " + paymentId + " not found.");
+			log.warn("Payment with Ride ID {} not found for status update.", rideId);
+			throw new PaymentNotFoundException("Payment with Ride ID " + rideId + " not found.");
 		}
 	}
 

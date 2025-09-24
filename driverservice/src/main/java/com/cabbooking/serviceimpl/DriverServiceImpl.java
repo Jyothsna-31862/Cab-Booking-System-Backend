@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import com.cabbooking.entity.Driver;
 import com.cabbooking.service.DriverService;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -118,12 +120,12 @@ public class DriverServiceImpl implements DriverService {
    
     public DriverDto getAvailableDrivers(String carSr) {
             log.info("Getting first available driver with car seater: {}", carSr);
-            Driver availableDriver = driverRepository.findFirstByIsAvailableAndCarSeater(true, carSr)
-                    .orElseThrow(() -> {
-                        log.warn("No available drivers found for car seater: {}", carSr);
-                        return new DriverNotFoundException("No available drivers found for car seater: " + carSr);
-                    });
-            return modelMapper.map(availableDriver, DriverDto.class);
+            List<Driver> availableDriver = driverRepository.findAllByIsAvailableAndCarSeater(carSr);
+            if(availableDriver.isEmpty()){
+                    log.warn("No available drivers found for car seater: {}", carSr);
+                    throw new DriverNotFoundException("No available drivers found for car seater: " + carSr);
+            }
+            return modelMapper.map(availableDriver.stream().findFirst(), DriverDto.class);
     }
 
     @Override

@@ -5,7 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.cabbooking.paymentservice.entity.Payment;
 
+import java.util.Optional;
+
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, String>{
+
+    Optional<Payment> findByRideId(String rideId);
 
 }
