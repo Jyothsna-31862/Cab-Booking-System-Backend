@@ -175,45 +175,46 @@ public class PaymentControllerTests {
     }
 
     @Test
-    @DisplayName("PUT /api/payments/{paymentId}/status should update payment status")
+    @DisplayName("PATCH /api/payments/{rideId}/status should update payment status")
     void updatePaymentStatus_ReturnsOkAndUpdatedPayment() throws Exception {
 
-        String paymentId = "pay-123";
+        String rideId = "ride-456";
         String newStatus = "REFUNDED";
         Map<String, String> statusUpdate = new HashMap<>();
         statusUpdate.put("status", newStatus);
 
         PaymentDto updatedPayment = new PaymentDto();
-        updatedPayment.setPaymentId(paymentId);
+        updatedPayment.setPaymentId("pay-123");
+        updatedPayment.setRideId(rideId);
         updatedPayment.setStatus(newStatus);
         updatedPayment.setAmount(testPaymentDto.getAmount());
 
-        when(paymentService.updatePaymentStatus(paymentId, newStatus)).thenReturn(updatedPayment);
+        when(paymentService.updatePaymentStatus(rideId, newStatus)).thenReturn(updatedPayment);
 
 
-        mockMvc.perform(put("/api/payments/{paymentId}/status", paymentId)
+        mockMvc.perform(patch("/api/payments/{rideId}/status", rideId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusUpdate)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("success"))
                 .andExpect(jsonPath("$.message").value("Payment status updated successfully to: " + newStatus))
-                .andExpect(jsonPath("$.data.paymentId").value(paymentId))
+                .andExpect(jsonPath("$.data.paymentId").value("pay-123"))
                 .andExpect(jsonPath("$.data.status").value(newStatus));
 
-        verify(paymentService, times(1)).updatePaymentStatus(paymentId, newStatus);
+        verify(paymentService, times(1)).updatePaymentStatus(rideId, newStatus);
     }
 
     @Test
-    @DisplayName("PUT /api/payments/{paymentId}/status should reject empty status")
+    @DisplayName("PATCH /api/payments/{rideId}/status should reject empty status")
     void updatePaymentStatus_ReturnsBadRequestWhenStatusIsEmpty() throws Exception {
 
-        String paymentId = "pay-123";
+        String rideId = "ride-456";
         Map<String, String> statusUpdate = new HashMap<>();
         statusUpdate.put("status", "");
 
 
-        mockMvc.perform(put("/api/payments/{paymentId}/status", paymentId)
+        mockMvc.perform(patch("/api/payments/{rideId}/status", rideId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusUpdate)))
                 .andExpect(status().isBadRequest())
@@ -224,49 +225,24 @@ public class PaymentControllerTests {
     }
 
     @Test
-    @DisplayName("PUT /api/payments/{paymentId}/status should handle invalid status")
+    @DisplayName("PATCH /api/payments/{rideId}/status should handle invalid status")
     void updatePaymentStatus_ReturnsBadRequestWhenStatusIsInvalid() throws Exception {
-        String paymentId = "pay-123";
+        String rideId = "ride-456";
         String invalidStatus = "INVALID_STATUS";
         Map<String, String> statusUpdate = new HashMap<>();
         statusUpdate.put("status", invalidStatus);
 
-        when(paymentService.updatePaymentStatus(paymentId, invalidStatus))
+        when(paymentService.updatePaymentStatus(rideId, invalidStatus))
                 .thenThrow(new IllegalArgumentException("Invalid payment status: " + invalidStatus));
 
 
-        mockMvc.perform(put("/api/payments/{paymentId}/status", paymentId)
+        mockMvc.perform(patch("/api/payments/{rideId}/status", rideId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusUpdate)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("error"))
                 .andExpect(jsonPath("$.message").value("Invalid payment status: " + invalidStatus));
 
-        verify(paymentService, times(1)).updatePaymentStatus(paymentId, invalidStatus);
-    }
-
-    @Test
-    @DisplayName("PATCH /api/payments/{paymentId}/status should update status with query param")
-    void updatePaymentStatusWithParam_ReturnsOkAndUpdatedPayment() throws Exception {
-
-        String paymentId = "pay-123";
-        String newStatus = "CANCELLED";
-
-        PaymentDto updatedPayment = new PaymentDto();
-        updatedPayment.setPaymentId(paymentId);
-        updatedPayment.setStatus(newStatus);
-        updatedPayment.setAmount(testPaymentDto.getAmount());
-
-        when(paymentService.updatePaymentStatus(paymentId, newStatus)).thenReturn(updatedPayment);
-
-
-        mockMvc.perform(patch("/api/payments/{paymentId}/status", paymentId)
-                        .param("status", newStatus))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("success"))
-                .andExpect(jsonPath("$.data.status").value(newStatus));
-
-        verify(paymentService, times(1)).updatePaymentStatus(paymentId, newStatus);
+        verify(paymentService, times(1)).updatePaymentStatus(rideId, invalidStatus);
     }
 }

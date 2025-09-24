@@ -236,29 +236,32 @@ public class PaymentServiceTests {
     @DisplayName("updatePaymentStatus() should update status when payment exists")
     void updatePaymentStatus_shouldUpdateStatus_whenPaymentExists() {
 
-        String paymentId = "pay-123";
+        String rideId = "ride-456"; // Use rideId instead of paymentId
         String newStatus = "REFUNDED";
         Payment updatedPayment = new Payment();
-        updatedPayment.setPaymentId(paymentId);
+        updatedPayment.setPaymentId("pay-123");
+        updatedPayment.setRideId(rideId);
         updatedPayment.setStatus(newStatus);
 
         PaymentDto updatedPaymentDto = new PaymentDto();
-        updatedPaymentDto.setPaymentId(paymentId);
+        updatedPaymentDto.setPaymentId("pay-123");
+        updatedPaymentDto.setRideId(rideId);
         updatedPaymentDto.setStatus(newStatus);
 
-        when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(testPaymentEntity));
+        when(paymentRepository.findByRideId(rideId)).thenReturn(Optional.of(testPaymentEntity)); // Mock findByRideId instead of findById
         when(paymentRepository.save(any(Payment.class))).thenReturn(updatedPayment);
         when(modelMapper.map(updatedPayment, PaymentDto.class)).thenReturn(updatedPaymentDto);
 
 
-        PaymentDto result = paymentService.updatePaymentStatus(paymentId, newStatus);
+        PaymentDto result = paymentService.updatePaymentStatus(rideId, newStatus); // Pass rideId instead of paymentId
 
 
         assertNotNull(result);
-        assertEquals(paymentId, result.getPaymentId());
+        assertEquals("pay-123", result.getPaymentId());
+        assertEquals(rideId, result.getRideId());
         assertEquals(newStatus, result.getStatus());
 
-        verify(paymentRepository, times(1)).findById(paymentId);
+        verify(paymentRepository, times(1)).findByRideId(rideId); // Verify findByRideId was called
         verify(paymentRepository, times(1)).save(any(Payment.class));
         verify(modelMapper, times(1)).map(updatedPayment, PaymentDto.class);
     }
