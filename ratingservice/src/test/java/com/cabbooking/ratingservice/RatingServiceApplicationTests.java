@@ -8,3 +8,4 @@ import org.springframework.test.context.ActiveProfiles;
 class RatingServiceApplicationTests {
 
 }
+

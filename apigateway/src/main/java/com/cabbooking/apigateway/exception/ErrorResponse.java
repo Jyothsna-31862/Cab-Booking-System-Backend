@@ -10,12 +10,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
-    private String status;
+    private String errorCode;
     private String message;
     private LocalDateTime timestamp;
+    private int statusCode;
+
+    public ErrorResponse(String error, String message, LocalDateTime now) {
+    }
 
     public static ErrorResponse fail(String message){
         return new ErrorResponse("error", message, LocalDateTime.now());
     }
 }
-

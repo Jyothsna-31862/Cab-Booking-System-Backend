@@ -38,36 +38,28 @@ public class RatingServiceImpl implements RatingService {
         try {
             savedRating = ratingRepository.save(rating);
             log.info("Rating successfully saved with ID: {}", savedRating.getRatingId());
-
-
-            Double r = getAverageRatingForDriver(ratingDTO.getDriverId());
-
-            updateDriverAverageRating(r, ratingDTO.getDriverId());
-
-            log.info("Successfully updated average rating for driver: {}", savedRating.getDriverId());
-
-
-
         } catch (Exception e) {
             log.error("Failed to save rating to the database.", e);
             throw new RuntimeException("An error occurred while saving the rating.");
+        }
+
+        // Try to update driver average rating, but don't fail the entire operation if it doesn't work
+        try {
+            Double averageRating = getAverageRatingForDriver(ratingDTO.getDriverId());
+            updateDriverAverageRating(averageRating, ratingDTO.getDriverId());
+            log.info("Successfully updated average rating for driver: {}", savedRating.getDriverId());
+        } catch (Exception e) {
+            log.error("Failed to update driver average rating, but rating was saved successfully", e);
+            // Don't throw exception here - the rating was saved successfully
         }
 
         return modelMapper.map(savedRating, RatingDTO.class);
     }
 
     private void updateDriverAverageRating(Double rating, String driverId) {
-        try {
-            log.info("Updating average rating for driver: {}", driverId);
-
-
-            driverClient.updateDriverRating(driverId, rating);
-
-            log.info("Successfully updated driver {} with new average rating: {}", driverId, rating);
-
-        } catch (Exception e) {
-            log.error("Failed to update driver average rating for driver {}: {}", driverId, e.getMessage());
-        }
+        log.info("Updating average rating for driver: {}", driverId);
+        driverClient.updateDriverRating(driverId, rating);
+        log.info("Successfully updated driver {} with new average rating: {}", driverId, rating);
     }
 
     @Override
