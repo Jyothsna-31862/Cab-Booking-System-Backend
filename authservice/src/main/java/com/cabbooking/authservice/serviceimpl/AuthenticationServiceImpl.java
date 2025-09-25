@@ -9,7 +9,6 @@ import com.cabbooking.authservice.repository.UserRepository;
 import com.cabbooking.authservice.security.JwtTokenProvider;
 import com.cabbooking.authservice.service.AuthenticationService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -168,8 +167,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if ("driver".equalsIgnoreCase(role)) {
             response = driverClient.deleteDriver(email);
+            if(response.getStatusCode() == HttpStatus.OK) {
+                userRepository.deleteByEmail(email);
+            }
         } else {
             response = userClient.deleteUser(email);
+            if(response.getStatusCode() == HttpStatus.OK) {
+                userRepository.deleteByEmail(email);
+            }
         }
 
         if (response.getStatusCode() == HttpStatus.OK) {
