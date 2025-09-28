@@ -71,7 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserServiceResponse registerUser(UserRequest userRequest) {
 
 
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(userRequest.getEmail()))) {
             throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + userRequest.getEmail());
         }
 
@@ -97,7 +97,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public DriverServiceResponse registerDriver(DriverRequest driverRequest) {
 
-        if(userRepository.existsByEmail(driverRequest.getEmail())) {
+        if(Boolean.TRUE.equals(userRepository.existsByEmail(driverRequest.getEmail()))) {
             throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + driverRequest.getEmail());
         }
 
