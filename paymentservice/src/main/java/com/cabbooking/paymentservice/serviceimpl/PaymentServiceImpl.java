@@ -59,9 +59,11 @@ import java.util.Optional;
 
 import com.cabbooking.paymentservice.exception.PaymentFailedException;
 import com.cabbooking.paymentservice.exception.PaymentNotFoundException;
+import com.cabbooking.paymentservice.exception.PaymentProcessingException;
+import com.cabbooking.paymentservice.exception.PdfGenerationException;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfDocument;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
 			return modelMapper.map(savedPayment, PaymentDto.class);
 		} catch (Exception e) {
 			log.error("An error occurred while saving the payment to the repository.", e);
-			throw new RuntimeException("Payment saving failed unexpectedly.", e);
+			throw new PaymentProcessingException("Payment saving failed unexpectedly.", e);
 		}
 	}
 
@@ -125,7 +127,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public byte[] generateReceiptPdf(PaymentDto paymentDto) {
-		// Check for null payment FIRST - this is what test case 9 expects
 		if (paymentDto == null) {
 			throw new IllegalArgumentException("Payment details cannot be null");
 		}
@@ -136,13 +137,13 @@ public class PaymentServiceImpl implements PaymentService {
 			PdfWriter.getInstance(document, baos);
 			document.open();
 
-			// Invoice Title
+
 			Paragraph title = new Paragraph("Payment Invoice");
-			title.setAlignment(Paragraph.ALIGN_CENTER);
+			title.setAlignment(Element.ALIGN_CENTER);
 			document.add(title);
 			document.add(new Paragraph(" ")); // Empty line
 
-			// Invoice Table
+
 			PdfPTable table = new PdfPTable(2);
 			table.setWidthPercentage(80);
 			table.setSpacingBefore(10f);
@@ -169,17 +170,8 @@ public class PaymentServiceImpl implements PaymentService {
 			return baos.toByteArray();
 		} catch (Exception e) {
 			log.error("An error occurred during PDF generation for payment Id {}.", paymentDto.getPaymentId());
-			throw new RuntimeException("Failed to generate PDF INVOICE.", e);
+			throw new PdfGenerationException("Failed to generate PDF INVOICE.", e);
 		}
-	}
-
-
-	private String maskCardNumber(String cardNumber) {
-		if (cardNumber == null || cardNumber.length() < 16) {
-			return "Not enough digits to mask"; // Not enough digits to mask
-		}
-		String lastFourDigits = cardNumber.substring(cardNumber.length() - 4);
-		return "**** **** **** " + lastFourDigits;
 	}
 
 
@@ -209,7 +201,7 @@ public class PaymentServiceImpl implements PaymentService {
 				return modelMapper.map(updatedPayment, PaymentDto.class);
 			} catch (Exception e) {
 				log.error("Failed to save updated payment status for ID: {}", rideId, e);
-				throw new RuntimeException("Failed to update payment status.", e);
+				throw new PaymentProcessingException("Failed to update payment status.", e);
 			}
 		} else {
 			log.warn("Payment with Ride ID {} not found for status update.", rideId);
@@ -218,4 +210,3 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 }
-

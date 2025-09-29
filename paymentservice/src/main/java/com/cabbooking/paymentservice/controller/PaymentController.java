@@ -1,7 +1,6 @@
 package com.cabbooking.paymentservice.controller;
 
 import java.util.Map;
-import java.util.Optional;
 
 import com.cabbooking.paymentservice.dto.ApiResponse;
 import org.springframework.core.io.ByteArrayResource;
@@ -18,6 +17,9 @@ import com.cabbooking.paymentservice.service.PaymentService;
 @RequestMapping("/api/payments")
 public class PaymentController {
 
+	private static final String SUCCESS_STATUS = "success";
+	private static final String ERROR_STATUS = "error";
+
 	private final PaymentService paymentService;
 
 	public PaymentController(PaymentService paymentService)
@@ -28,14 +30,14 @@ public class PaymentController {
 	@PostMapping
 	public ResponseEntity<ApiResponse> createPayment(@RequestBody PaymentDto paymentDto) {
 		PaymentDto newPayment = paymentService.createPayment(paymentDto);
-		ApiResponse apiResponse = new ApiResponse("success", "Payment created successfully", newPayment);
+		ApiResponse apiResponse = new ApiResponse(SUCCESS_STATUS, "Payment created successfully", newPayment);
 		return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{paymentId}")
 	public ResponseEntity<ApiResponse> getPaymentById(@PathVariable String paymentId) {
 		PaymentDto payment = paymentService.getPaymentById(paymentId);
-		ApiResponse apiResponse = new ApiResponse("success", "Payment retrieved successfully", payment);
+		ApiResponse apiResponse = new ApiResponse(SUCCESS_STATUS, "Payment retrieved successfully", payment);
 		return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 	}
 
@@ -65,22 +67,22 @@ public class PaymentController {
 		try {
 			String newStatus = statusUpdate.get("status");
 			if (newStatus == null || newStatus.trim().isEmpty()) {
-				ApiResponse errorResponse = new ApiResponse("error", "Status is required", null);
+				ApiResponse errorResponse = new ApiResponse(ERROR_STATUS, "Status is required", null);
 				return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 			}
 
 			PaymentDto updatedPayment = paymentService.updatePaymentStatus(rideId, newStatus);
-			ApiResponse apiResponse = new ApiResponse("success",
+			ApiResponse apiResponse = new ApiResponse(SUCCESS_STATUS,
 					"Payment status updated successfully to: " + newStatus, updatedPayment);
 
 			return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 
 		} catch (IllegalArgumentException e) {
-			ApiResponse errorResponse = new ApiResponse("error", e.getMessage(), null);
+			ApiResponse errorResponse = new ApiResponse(ERROR_STATUS, e.getMessage(), null);
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 
 		} catch (Exception e) {
-			ApiResponse errorResponse = new ApiResponse("error", "Failed to update payment status", null);
+			ApiResponse errorResponse = new ApiResponse(ERROR_STATUS, "Failed to update payment status", null);
 			return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
