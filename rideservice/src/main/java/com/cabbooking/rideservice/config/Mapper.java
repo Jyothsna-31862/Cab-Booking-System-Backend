@@ -1,6 +1,5 @@
 package com.cabbooking.rideservice.config;
 
-import com.cabbooking.rideservice.dto.RideDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

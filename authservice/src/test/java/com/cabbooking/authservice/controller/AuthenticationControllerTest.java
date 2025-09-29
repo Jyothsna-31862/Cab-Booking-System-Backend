@@ -37,11 +37,9 @@ class AuthenticationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // Application service mock
     @MockitoBean
     private AuthenticationService authenticationService;
 
-    // Security related mocks to satisfy SecurityConfig constructor dependencies
     @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
 

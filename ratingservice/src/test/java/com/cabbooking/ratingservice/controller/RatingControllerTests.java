@@ -194,8 +194,7 @@ public class RatingControllerTests {
         // Use a more flexible mocking approach - mock based on any RatingDTO
         // and return the appropriate response based on the score
         when(ratingService.createRating(any(RatingDTO.class))).thenAnswer(invocation -> {
-            RatingDTO input = invocation.getArgument(0);
-            return input; // Return the same object that was passed in
+            return invocation.getArgument(0);
         });
 
         // Test each score value
@@ -236,9 +235,7 @@ public class RatingControllerTests {
     @Test
     @DisplayName("GET endpoints should handle URL encoding")
     void endpoints_shouldHandleUrlEncoding() throws Exception {
-        // Test with simple encoded URLs (single encoding)
-        String encodedRideId = "ride%20123";  // This becomes "ride 123"
-        String encodedDriverId = "driver%20456";  // This becomes "driver 456"
+
 
         // Mock with the decoded values that Spring will pass to the service
         when(ratingService.getRatingById("ride 123")).thenReturn(Optional.of(testRatingDTO));

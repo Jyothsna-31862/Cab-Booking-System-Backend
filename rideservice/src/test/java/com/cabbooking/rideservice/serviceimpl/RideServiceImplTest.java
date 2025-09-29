@@ -30,14 +30,12 @@ public class RideServiceImplTest {
     @Mock
     private RideRepository rideRepository;
 
-    private ModelMapper modelMapper; // use real mapper for simplicity
-
     @InjectMocks
-    private RideServiceImpl rideService; // will reassign after modelMapper init
+    private RideServiceImpl rideService;
 
     @BeforeEach
     void setUp() {
-        modelMapper = new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
         rideService = new RideServiceImpl(rideRepository, modelMapper);
     }
 
