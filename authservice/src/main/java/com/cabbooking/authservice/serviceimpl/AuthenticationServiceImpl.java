@@ -9,7 +9,6 @@ import com.cabbooking.authservice.repository.UserRepository;
 import com.cabbooking.authservice.security.JwtTokenProvider;
 import com.cabbooking.authservice.service.AuthenticationService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,6 +34,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserClient userClient;
     private final DriverClient driverClient;
 
+    private static final String USER_NOT_FOUND_MESSAGE = "User with that email does not exist.";
+    private static final String ROLE_DRIVER = "driver";
+
 
     @Override
     public JwtResponse login(LoginDto loginDto) {
@@ -47,7 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.info("Authentication successful for email: {}", loginDto.getEmail());
             User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
             log.info("User found: {}", user);
-            if (user.getRole().equalsIgnoreCase("driver")) {
+            if (user.getRole().equalsIgnoreCase(ROLE_DRIVER)) {
                 ResponseEntity<DriverDto> driverDtoResponse = driverClient.getDriverByEmail(user.getEmail());
                 DriverDto driverDto = driverDtoResponse.getBody();
                 jwtResponse.setId(driverDto.getDriverId());
@@ -72,7 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public UserServiceResponse registerUser(UserRequest userRequest) {
 
 
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(userRequest.getEmail()))) {
             throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + userRequest.getEmail());
         }
 
@@ -82,7 +84,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         ResponseEntity<UserServiceResponse> userServiceResponse = userClient.registerUser(userRequest);
 
         if (userServiceResponse.getStatusCode() == HttpStatus.CREATED && userServiceResponse.getBody() != null) {
-            UserDto userDto = userServiceResponse.getBody().getBody();
+            UserServiceResponse responseBody = userServiceResponse.getBody();
+            UserDto userDto = null;
+            if (responseBody != null) {
+                userDto = responseBody.getBody();
+            }
+            if (userDto == null) {
+                throw new AuthenticationAPIException(HttpStatus.INTERNAL_SERVER_ERROR, "User details not found in response.");
+            }
+
 
             User user = new User();
             user.setEmail(userDto.getEmail());
@@ -98,7 +108,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public DriverServiceResponse registerDriver(DriverRequest driverRequest) {
 
-        if(userRepository.existsByEmail(driverRequest.getEmail())) {
+        if(Boolean.TRUE.equals(userRepository.existsByEmail(driverRequest.getEmail()))) {
             throw new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Given Email Already Registered: " + driverRequest.getEmail());
         }
 
@@ -108,7 +118,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         ResponseEntity<DriverServiceResponse> driverResponse = driverClient.registerDriver(driverRequest);
 
         if (driverResponse.getStatusCode() == HttpStatus.CREATED && driverResponse.getBody() != null) {
-            DriverDto driverDto = driverResponse.getBody().getBody();
+
+            DriverServiceResponse driverServiceResponse = driverResponse.getBody();
+            DriverDto driverDto = null;
+            if (driverServiceResponse != null) {
+                driverDto = driverServiceResponse.getBody();
+            }
+            if (driverDto == null) {
+                throw new AuthenticationAPIException(HttpStatus.INTERNAL_SERVER_ERROR, "Driver details not found in response.");
+            }
+
 
             User user = new User();
             user.setEmail(driverDto.getEmail());
@@ -124,7 +143,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public PasswordResetResponse resetPassword(ForgotPassword forgotPassword) {
 
-        User u =  userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(()-> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+        User u =  userRepository.findByEmail(forgotPassword.getEmail()).orElseThrow(()-> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, USER_NOT_FOUND_MESSAGE));
 
         String role = u.getRole();
 
@@ -135,7 +154,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String status;
         String message;
         try {
-            if ("driver".equalsIgnoreCase(role)) {
+            if (ROLE_DRIVER.equalsIgnoreCase(role)) {
                 User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "Driver with that email does not exist."));
                 user.setPassword(encodedPassword);
                 userRepository.save(user);
@@ -143,7 +162,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 status = "success";
                 message = "Driver password reset successfully";
             } else {
-                User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+                User user = userRepository.findByEmail(email).orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, USER_NOT_FOUND_MESSAGE));
                 user.setPassword(encodedPassword);
                 userRepository.save(user);
                 userClient.forgotPassword(forgotPassword);
@@ -161,15 +180,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public String deleteUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, "User with that email does not exist."));
+                .orElseThrow(() -> new AuthenticationAPIException(HttpStatus.BAD_REQUEST, USER_NOT_FOUND_MESSAGE));
 
         String role = user.getRole();
         ResponseEntity<String> response;
 
-        if ("driver".equalsIgnoreCase(role)) {
+        if (ROLE_DRIVER.equalsIgnoreCase(role)) {
             response = driverClient.deleteDriver(email);
+            if(response.getStatusCode() == HttpStatus.OK) {
+                userRepository.deleteByEmail(email);
+            }
         } else {
             response = userClient.deleteUser(email);
+            if(response.getStatusCode() == HttpStatus.OK) {
+                userRepository.deleteByEmail(email);
+            }
         }
 
         if (response.getStatusCode() == HttpStatus.OK) {

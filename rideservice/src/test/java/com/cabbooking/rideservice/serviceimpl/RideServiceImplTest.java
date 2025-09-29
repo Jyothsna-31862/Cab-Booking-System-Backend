@@ -30,14 +30,12 @@ public class RideServiceImplTest {
     @Mock
     private RideRepository rideRepository;
 
-    private ModelMapper modelMapper; // use real mapper for simplicity
-
     @InjectMocks
-    private RideServiceImpl rideService; // will reassign after modelMapper init
+    private RideServiceImpl rideService;
 
     @BeforeEach
     void setUp() {
-        modelMapper = new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
         rideService = new RideServiceImpl(rideRepository, modelMapper);
     }
 
@@ -149,18 +147,18 @@ public class RideServiceImplTest {
         ArrayList<Ride> rides = new ArrayList<>();
         rides.add(buildRide("ride-6", "user9", "driver2", "PENDING"));
         rides.add(buildRide("ride-7", "user9", "driver4", "COMPLETED"));
-        when(rideRepository.findAllByUserId("user9")).thenReturn(rides);
+        when(rideRepository.findAllByUserIdOrderByBookingDateDescBookingTimeDesc("user9")).thenReturn(rides);
 
         var list = rideService.getAllUserRides("user9");
         assertThat(list).hasSize(2);
-        verify(rideRepository).findAllByUserId("user9");
+        verify(rideRepository).findAllByUserIdOrderByBookingDateDescBookingTimeDesc("user9");
     }
 
     @Test
     void getAllDriverRides_success() {
         ArrayList<Ride> rides = new ArrayList<>();
         rides.add(buildRide("ride-8", "user10", "driver55", "PENDING"));
-        when(rideRepository.findAllByDriverId("driver55")).thenReturn(rides);
+        when(rideRepository.findAllByDriverIdOrderByBookingDateDescBookingTimeDesc("driver55")).thenReturn(rides);
 
         var list = rideService.getAllDriverRides("driver55");
         assertThat(list).hasSize(1);

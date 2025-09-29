@@ -3,12 +3,9 @@ package com.cabbooking.rideservice.service;
 import com.cabbooking.rideservice.dto.CancelDto;
 import com.cabbooking.rideservice.dto.RideDto;
 import com.cabbooking.rideservice.dto.SuccessResponseDto;
-import com.cabbooking.rideservice.entity.Ride;
-import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public interface RideService {

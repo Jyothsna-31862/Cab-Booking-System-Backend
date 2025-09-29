@@ -59,7 +59,6 @@ public class AuthenticationServiceImplTest {
         UserDto userDto = new UserDto();
         userDto.setUserId("user-1");
         userDto.setEmail(loginDto.getEmail());
-        JwtResponse jwtResponse = new JwtResponse();
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(userRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(user));

@@ -9,6 +9,8 @@ import java.util.Random;
 @Configuration
 public class MapperConfig {
 
+    private final Random random = new Random();
+
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
@@ -16,7 +18,6 @@ public class MapperConfig {
 
     @Bean
     public Integer generateCode(){
-        Random random = new Random();
         return 1000 + random.nextInt(9000);
     }
 }

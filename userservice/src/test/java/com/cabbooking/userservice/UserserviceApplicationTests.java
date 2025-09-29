@@ -10,11 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @Suite
-@SelectClasses(
-		{
-				UserControllerTest.class,
-				UserServiceImplTest.class
-		}
+@SelectClasses({
+		UserControllerTest.class,
+		UserServiceImplTest.class
+	}
 )
 class UserserviceApplicationTests {
 

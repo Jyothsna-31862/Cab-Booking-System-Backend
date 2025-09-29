@@ -42,7 +42,6 @@ public class Payment {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    //need to write function
     private Timestamp deletedAt;
 }
 

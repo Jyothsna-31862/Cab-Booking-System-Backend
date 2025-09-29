@@ -18,7 +18,6 @@ public class GatewayConfig {
 
     private final AuthValidationFilter authValidationFilter;
 
-    // Highest precedence CORS filter so preflight responses include headers BEFORE auth filter runs
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
         CorsConfiguration config = new CorsConfiguration();
