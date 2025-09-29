@@ -23,8 +23,6 @@ public interface DriverRepository extends JpaRepository<Driver, String> {
 
     Optional<Driver> findByEmail(String email);
 
-    boolean existsByDriverId(String driverId);
-
     @Query("SELECT d FROM Driver d WHERE d.isAvailable = true AND d.carSeater = :carSr")
     List<Driver> findAllByIsAvailableAndCarSeater(@Param("carSr") String carSr);
 

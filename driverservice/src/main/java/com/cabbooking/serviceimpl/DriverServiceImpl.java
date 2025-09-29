@@ -20,6 +20,9 @@ import java.util.List;
 @Service
 public class DriverServiceImpl implements DriverService {
 
+    private static final String NOT_FOUND = " not found";
+    private static final String DRIVER_WITH_ID = "Driver with ID ";
+
     private final DriverRepository driverRepository;
     private final ModelMapper modelMapper;
 
@@ -47,7 +50,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverDto getDriverById(String id) throws DriverNotFoundException {
         log.info("Getting driver by ID: {}", id);
             Driver driver = driverRepository.findByDriverId(id)
-                    .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
+                    .orElseThrow(() -> new DriverNotFoundException(DRIVER_WITH_ID + id + NOT_FOUND));
             log.info("Driver found: {}", driver);
             return modelMapper.map(driver, DriverDto.class);
     }
@@ -56,43 +59,17 @@ public class DriverServiceImpl implements DriverService {
     public DriverDto updateDriverRating(String driverId, double rating) throws DriverNotFoundException {
         log.info("Updating rating for driver ID: {} to {}", driverId, rating);
         Driver driver = driverRepository.findByDriverId(driverId)
-                .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + driverId + " not found"));
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_WITH_ID + driverId + NOT_FOUND));
         driver.setRating(rating);
         log.info("New rating set: {}", driver.getRating());
         Driver updatedDriver = driverRepository.save(driver);
         return modelMapper.map(updatedDriver, DriverDto.class);
     }
 
-    public DriverDto updateDriverProfile(String id, DriverRequest driverRequest) throws DriverNotFoundException {
-        log.info("Updating driver profile for ID: {}", id);
-
-        Driver driver = driverRepository.findByDriverId(id)
-                .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
-
-        if (driverRequest.getEmail() != null && !driverRequest.getEmail().isEmpty()
-                && !driver.getEmail().equals(driverRequest.getEmail())
-                && driverRepository.existsByEmail(driverRequest.getEmail())) {
-            throw new EmailAlreadyExistsException("Email already registered: " + driverRequest.getEmail());
-        }
-
-        if (driverRequest.getPhone() != null && !driverRequest.getPhone().isEmpty()
-                && !driver.getPhone().equals(driverRequest.getPhone())
-                && driverRepository.existsByPhone(driverRequest.getPhone())) {
-            throw new PhoneAlreadyExistsException("Phone number already registered: " + driverRequest.getPhone());
-        }
-           
-        modelMapper.map(driverRequest, driver);
-        driver.setDriverId(id);
-
-        Driver updatedDriver = driverRepository.save(driver);
-        log.info("Driver profile updated successfully");
-        return modelMapper.map(updatedDriver, DriverDto.class);
-    }
-
     public String deleteDriver(String email) throws DriverNotFoundException {
         log.info("Deleting driver with Email: {}", email);
         Driver driver = driverRepository.findByEmail(email)
-                    .orElseThrow(() -> new DriverNotFoundException("Driver with Email " + email + " not found"));
+                    .orElseThrow(() -> new DriverNotFoundException("Driver with Email " + email + NOT_FOUND));
         driverRepository.delete(driver);
         log.info("Driver deleted successfully");
         return "Driver Deleted Successfully";
@@ -101,7 +78,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverServiceResponse forgotPassword(String email,String newPassword) {
         log.info("Processing forgot password request for email: {}", email);
         Driver driver = driverRepository.findByEmail(email)
-                .orElseThrow(() -> new DriverNotFoundException("Driver with email " + email + " not found"));
+                .orElseThrow(() -> new DriverNotFoundException("Driver with email " + email + NOT_FOUND));
         driver.setPassword(newPassword);
         driverRepository.save(driver);
         DriverServiceResponse response = new DriverServiceResponse();
@@ -113,7 +90,7 @@ public class DriverServiceImpl implements DriverService {
     public DriverDto updateDriverStatus(String id) throws DriverNotFoundException {
         log.info("Updating status for driver ID: {}", id);
         Driver driver = driverRepository.findByDriverId(id)
-                .orElseThrow(() -> new DriverNotFoundException("Driver with ID " + id + " not found"));
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_WITH_ID + id + NOT_FOUND));
         driver.setAvailable(!driver.isAvailable());
         Driver updatedDriver = driverRepository.save(driver);
         log.info("Driver status updated successfully to: {}", updatedDriver.isAvailable());
@@ -132,7 +109,33 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public DriverDto getDriverByEmail(String email) {
-        Driver driver = driverRepository.findByEmail(email).orElseThrow(() -> new DriverNotFoundException("Driver with Email " + email + " not found"));
+        Driver driver = driverRepository.findByEmail(email).orElseThrow(() -> new DriverNotFoundException("Driver with Email " + email + NOT_FOUND));
         return modelMapper.map(driver,DriverDto.class);
+    }
+
+    public DriverDto updateDriverProfile(String id, DriverRequest driverRequest) throws DriverNotFoundException {
+        log.info("Updating driver profile for ID: {}", id);
+
+        Driver driver = driverRepository.findByDriverId(id)
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_WITH_ID + id + NOT_FOUND));
+
+        if (driverRequest.getEmail() != null && !driverRequest.getEmail().isEmpty()
+                && !driver.getEmail().equals(driverRequest.getEmail())
+                && driverRepository.existsByEmail(driverRequest.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already registered: " + driverRequest.getEmail());
+        }
+
+        if (driverRequest.getPhone() != null && !driverRequest.getPhone().isEmpty()
+                && !driver.getPhone().equals(driverRequest.getPhone())
+                && driverRepository.existsByPhone(driverRequest.getPhone())) {
+            throw new PhoneAlreadyExistsException("Phone number already registered: " + driverRequest.getPhone());
+        }
+
+        modelMapper.map(driverRequest, driver);
+        driver.setDriverId(id);
+
+        Driver updatedDriver = driverRepository.save(driver);
+        log.info("Driver profile updated successfully");
+        return modelMapper.map(updatedDriver, DriverDto.class);
     }
 }
