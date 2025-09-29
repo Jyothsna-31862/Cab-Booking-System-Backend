@@ -50,7 +50,7 @@ public class RatingServiceImpl implements RatingService {
 
         } catch (Exception e) {
             log.error("Failed to save rating to the database.", e);
-            throw new RuntimeException("An error occurred while saving the rating.");
+            throw new InvalidRatingException("An error occurred while saving the rating.");
         }
 
         return modelMapper.map(savedRating, RatingDTO.class);

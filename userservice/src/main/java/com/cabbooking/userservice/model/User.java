@@ -9,7 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-;
 
 @Entity
 @Table(name = "user")

@@ -1,57 +1,3 @@
-//package com.cabbooking.paymentservice.serviceimpl;
-//
-//import java.util.Optional;
-//
-//import com.cabbooking.paymentservice.exception.PaymentFailedException;
-//import com.cabbooking.paymentservice.exception.PaymentNotFoundException;
-//import org.modelmapper.ModelMapper;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import com.cabbooking.paymentservice.dto.PaymentDto;
-//import com.cabbooking.paymentservice.entity.Payment;
-//import com.cabbooking.paymentservice.repository.PaymentRepository;
-//import com.cabbooking.paymentservice.service.PaymentService;
-//
-//@Service
-//public class PaymentServiceImpl implements PaymentService {
-//
-//	private final PaymentRepository paymentRepository;
-//
-//	private final ModelMapper modelMapper;
-//
-//	public PaymentServiceImpl(PaymentRepository paymentRepository, ModelMapper modelMapper) {
-//		this.paymentRepository = paymentRepository;
-//		this.modelMapper = modelMapper;
-//	}
-//
-//	@Override
-//	public PaymentDto createPayment(PaymentDto paymentDto) {
-//
-//		if ("failed".equalsIgnoreCase(paymentDto.getStatus())) {
-//			throw new PaymentFailedException("Payment with status 'failed' cannot be processed.");
-//		}
-//
-//		Payment payment = modelMapper.map(paymentDto, Payment.class);
-//
-//		Payment savedPayment = paymentRepository.save(payment);
-//
-//		return modelMapper.map(savedPayment, PaymentDto.class);
-//	}
-//
-//	@Override
-//	public PaymentDto getPaymentById(Integer paymentId) {
-//		return paymentRepository.findById(paymentId)
-//				.map(payment -> modelMapper.map(payment, PaymentDto.class))
-//				.orElseThrow(() -> new PaymentNotFoundException("Payment with ID " + paymentId + " not found."));
-//	}
-//
-//
-//
-//
-//
-//}
-
 package com.cabbooking.paymentservice.serviceimpl;
 
 import java.io.ByteArrayOutputStream;
@@ -125,7 +71,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	public byte[] generateReceiptPdf(PaymentDto paymentDto) {
-		// Check for null payment FIRST - this is what test case 9 expects
 		if (paymentDto == null) {
 			throw new IllegalArgumentException("Payment details cannot be null");
 		}
@@ -140,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
 			Paragraph title = new Paragraph("Payment Invoice");
 			title.setAlignment(Paragraph.ALIGN_CENTER);
 			document.add(title);
-			document.add(new Paragraph(" ")); // Empty line
+			document.add(new Paragraph(" "));
 
 			// Invoice Table
 			PdfPTable table = new PdfPTable(2);
@@ -174,33 +119,22 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 
-	private String maskCardNumber(String cardNumber) {
-		if (cardNumber == null || cardNumber.length() < 16) {
-			return "Not enough digits to mask"; // Not enough digits to mask
-		}
-		String lastFourDigits = cardNumber.substring(cardNumber.length() - 4);
-		return "**** **** **** " + lastFourDigits;
-	}
-
 
 	@Override
 	public PaymentDto updatePaymentStatus(String rideId, String status) {
 		log.info("Attempting to update payment status for ID: {} to status: {}", rideId, status);
 
-		// Validate status
 		if (status == null || status.trim().isEmpty()) {
 			log.error("Status cannot be null or empty for payment ID: {}", rideId);
 			throw new IllegalArgumentException("Payment status cannot be null or empty.");
 		}
 
-		// Find the payment
 		Optional<Payment> paymentOptional = paymentRepository.findByRideId(rideId);
 
 		if (paymentOptional.isPresent()) {
 			Payment payment = paymentOptional.get();
 			String oldStatus = payment.getStatus();
 
-			// Update the status
 			payment.setStatus(status);
 
 			try {
