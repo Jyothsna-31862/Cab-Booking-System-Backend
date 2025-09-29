@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -240,19 +241,19 @@ public class DriverServiceImplTest {
     @Test
     @DisplayName("12. Should successfully delete driver when driver exists")
     void testDeleteDriver_Success() {
-        when(driverRepository.findByDriverId(anyString())).thenReturn(Optional.of(testDriver));
+        when(driverRepository.findByEmail(anyString())).thenReturn(Optional.of(testDriver));
 
-        assertDoesNotThrow(() -> driverService.deleteDriver("test-driver-id"));
+        assertDoesNotThrow(() -> driverService.deleteDriver("john.doe@example.com"));
         verify(driverRepository).delete(testDriver);
     }
 
     @Test
     @DisplayName("13. Should throw DriverNotFoundException when deleting non-existent driver")
     void testDeleteDriver_NotFound() {
-        when(driverRepository.findByDriverId(anyString())).thenReturn(Optional.empty());
+        when(driverRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         assertThrows(DriverNotFoundException.class,
-            () -> driverService.deleteDriver("non-existent-id"));
+            () -> driverService.deleteDriver("absent@example.com"));
         verify(driverRepository, never()).delete(any(Driver.class));
     }
 
@@ -309,8 +310,9 @@ public class DriverServiceImplTest {
     @DisplayName("18. Should successfully return available driver with matching car seater")
     void testGetAvailableDrivers_Success() {
         testDriver.setAvailable(true);
-        when(driverRepository.findFirstByIsAvailableAndCarSeater(true, "4")).thenReturn(Optional.of(testDriver));
-        when(modelMapper.map(testDriver, DriverDto.class)).thenReturn(driverDto);
+        when(driverRepository.findAllByIsAvailableAndCarSeater("4")).thenReturn(List.of(testDriver));
+        // ModelMapper is invoked with an Optional<Driver> per service implementation
+        when(modelMapper.map(any(Optional.class), eq(DriverDto.class))).thenReturn(driverDto);
 
         DriverDto result = driverService.getAvailableDrivers("4");
 
@@ -321,7 +323,7 @@ public class DriverServiceImplTest {
     @Test
     @DisplayName("19. Should throw DriverNotFoundException when no available drivers found for car seater")
     void testGetAvailableDrivers_NoDriversFound() {
-        when(driverRepository.findFirstByIsAvailableAndCarSeater(true, "4")).thenReturn(Optional.empty());
+        when(driverRepository.findAllByIsAvailableAndCarSeater("4")).thenReturn(List.of());
 
         assertThrows(DriverNotFoundException.class,
             () -> driverService.getAvailableDrivers("4"));

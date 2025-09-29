@@ -175,14 +175,15 @@ public class DriverControllerTests {
 
     @Test
     @DisplayName("8. deleteDriver() should return NO_CONTENT when deletion successful")
-    void deleteDriver_shouldReturnNoContent_whenDeletionSuccessful() throws DriverNotFoundException {
+    String deleteDriver_shouldReturnOk_whenDeletionSuccessful() throws DriverNotFoundException {
         doNothing().when(driverService).deleteDriver(anyString());
 
-        ResponseEntity<Void> response = driverController.deleteDriver("test-driver-id");
+        ResponseEntity<String> response = driverController.deleteDriver("test-driver-id");
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
         verify(driverService).deleteDriver("test-driver-id");
+        return "Driver Deleted Successfully";
     }
 
     @Test

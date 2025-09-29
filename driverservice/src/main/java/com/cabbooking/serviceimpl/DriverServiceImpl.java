@@ -96,7 +96,7 @@ public class DriverServiceImpl implements DriverService {
         log.info("Driver status updated successfully to: {}", updatedDriver.isAvailable());
         return modelMapper.map(updatedDriver, DriverDto.class);
     }
-   
+
     public DriverDto getAvailableDrivers(String carSr) {
             log.info("Getting first available driver with car seater: {}", carSr);
             List<Driver> availableDriver = driverRepository.findAllByIsAvailableAndCarSeater(carSr);
