@@ -40,7 +40,7 @@ public class RatingServiceImpl implements RatingService {
             log.info("Rating successfully saved with ID: {}", savedRating.getRatingId());
         } catch (Exception e) {
             log.error("Failed to save rating to the database.", e);
-            throw new RuntimeException("An error occurred while saving the rating.");
+            throw new InvalidRatingException("An error occurred while saving the rating.");
         }
 
         // Try to update driver average rating, but don't fail the entire operation if it doesn't work

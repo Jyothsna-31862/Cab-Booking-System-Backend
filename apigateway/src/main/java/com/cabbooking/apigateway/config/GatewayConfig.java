@@ -1,6 +1,7 @@
 package com.cabbooking.apigateway.config;
 
 import com.cabbooking.apigateway.filter.AuthValidationFilter;
+import com.cabbooking.apigateway.filter.ServiceAvailabilityFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,8 @@ import java.util.List;
 public class GatewayConfig {
 
     private final AuthValidationFilter authValidationFilter;
+    private final ServiceAvailabilityFilter serviceAvailabilityFilter;
 
-    // Highest precedence CORS filter so preflight responses include headers BEFORE auth filter runs
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
         CorsConfiguration config = new CorsConfiguration();
@@ -43,8 +44,16 @@ public class GatewayConfig {
         FilterRegistrationBean<AuthValidationFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(authValidationFilter);
         registrationBean.addUrlPatterns("/*");
-        // Run after CORS filter so OPTIONS is handled cleanly
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<ServiceAvailabilityFilter> serviceAvailabilityFilterRegistration() {
+        FilterRegistrationBean<ServiceAvailabilityFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(serviceAvailabilityFilter);
+        registrationBean.addUrlPatterns("/api/*");
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 2);
         return registrationBean;
     }
 }

@@ -19,9 +19,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private static final String SUCCESS = "success";
+    private static final String USER_NOT_FOUND = "User not found with ID: {}";
+    private static final String USER_WITH_EMAIL="User with email ";
+    private static final String USER_WITH_ID="User with ID ";
+    private static final String NOT_FOUND=" not found";
+
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final MapperConfig mapperConfig;
+//    private final static String SUCCESS="success"; String
 
     @Override
     public UserServiceResponse registerUser(UserRequest userRequest) {
@@ -46,7 +53,7 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = modelMapper.map(savedUser, UserDto.class);
         UserServiceResponse userResponse = new UserServiceResponse();
         userResponse.setBody(userDto);
-        userResponse.setStatus("success");
+        userResponse.setStatus(SUCCESS);
         userResponse.setMessage("User Registered Successfully");
 
         return userResponse;
@@ -58,8 +65,8 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByUserId(id)
                 .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", id);
-                    return new UserNotFoundException("User with ID " + id + " not found");
+                    log.error(USER_NOT_FOUND, id);
+                    return new UserNotFoundException(USER_WITH_ID + id + NOT_FOUND);
                 });
 
         return modelMapper.map(user, UserDto.class);
@@ -72,7 +79,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.error("User not found with email: {}", email);
-                    return new UserNotFoundException("User with email " + email + " not found");
+                    return new UserNotFoundException(USER_WITH_EMAIL + email + NOT_FOUND);
                 });
 
         return modelMapper.map(user, UserDto.class);
@@ -82,8 +89,8 @@ public class UserServiceImpl implements UserService {
     public UserServiceResponse updateUser(String id, UserRequest updateRequest) throws UserNotFoundException {
         User user = userRepository.findByUserId(id)
                 .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", id);
-                    return new UserNotFoundException("User with ID " + id + " not found");
+                    log.error(USER_NOT_FOUND, id);
+                    return new UserNotFoundException(USER_WITH_ID + id + NOT_FOUND);
                 });
 
         Integer code=user.getCode();
@@ -102,7 +109,7 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = modelMapper.map(user, UserDto.class);
         UserServiceResponse userResponse = new UserServiceResponse();
         userResponse.setBody(userDto);
-        userResponse.setStatus("success");
+        userResponse.setStatus(SUCCESS);
         userResponse.setMessage("User Updated Successfully");
         return userResponse;
     }
@@ -111,8 +118,8 @@ public class UserServiceImpl implements UserService {
     public String deleteUser(String email) throws UserNotFoundException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", email);
-                    return new UserNotFoundException("User with email " + email + " not found");
+                    log.error(USER_NOT_FOUND, email);
+                    return new UserNotFoundException(USER_WITH_EMAIL + email + NOT_FOUND);
                 });
 
         userRepository.delete(user);
@@ -126,8 +133,8 @@ public class UserServiceImpl implements UserService {
     public SuccessResponse verifyOtp(String userId, String code) throws UserNotFoundException {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> {
-                    log.error("User not found with ID: {}", userId);
-                    return new UserNotFoundException("User with ID " + userId + " not found");
+                    log.error(USER_NOT_FOUND,userId);
+                    return new UserNotFoundException(USER_WITH_ID + userId + NOT_FOUND);
                 });
 
         if (!(user.getCode().toString().equals(code))) {
@@ -135,7 +142,7 @@ public class UserServiceImpl implements UserService {
             throw new CodeNotMatchedException("Invalid code.");
 
         }
-        return new SuccessResponse("success","Code verified successfully." );
+        return new SuccessResponse(SUCCESS,"Code verified successfully." );
     }
 
     @Override
@@ -143,13 +150,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(forgotPassword.getEmail())
                 .orElseThrow(() -> {
                     log.error("User not found with email: {}", forgotPassword.getEmail());
-                    return new UserNotFoundException("User with email " + forgotPassword.getEmail() + " not found");
+                    return new UserNotFoundException(USER_WITH_EMAIL + forgotPassword.getEmail() + NOT_FOUND);
                 });
 
         user.setPassword(forgotPassword.getNewPassword());
         userRepository.save(user);
         log.info("Password updated successfully for user with email: {}", forgotPassword.getEmail());
-        return new SuccessResponse("success","Password updated successfully." );
+        return new SuccessResponse(SUCCESS,"Password updated successfully." );
     }
 
 }

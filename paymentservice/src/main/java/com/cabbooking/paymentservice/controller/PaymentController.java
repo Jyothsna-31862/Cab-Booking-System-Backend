@@ -1,8 +1,10 @@
 package com.cabbooking.paymentservice.controller;
 
 import java.util.Map;
+import java.util.Optional;
 
 import com.cabbooking.paymentservice.dto.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,17 +17,13 @@ import com.cabbooking.paymentservice.service.PaymentService;
 
 @RestController
 @RequestMapping("/api/payments")
+@RequiredArgsConstructor
 public class PaymentController {
 
 	private static final String SUCCESS_STATUS = "success";
 	private static final String ERROR_STATUS = "error";
 
 	private final PaymentService paymentService;
-
-	public PaymentController(PaymentService paymentService)
-	{
-		this.paymentService = paymentService;
-	}
 
 	@PostMapping
 	public ResponseEntity<ApiResponse> createPayment(@RequestBody PaymentDto paymentDto) {

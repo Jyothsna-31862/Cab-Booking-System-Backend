@@ -39,7 +39,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public RideDto getRideById(String rideId) {
-        Ride newRide = rideRepository.findById(rideId).orElseThrow(() -> new RideNotFoundException(rideId));;
+        Ride newRide = rideRepository.findById(rideId).orElseThrow(() -> new RideNotFoundException(rideId));
 
         return modelMapper.map(newRide, RideDto.class);
     }
@@ -83,9 +83,6 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(status.toUpperCase());
 
         switch (status.toUpperCase()) {
-//            case "ACCEPTED":
-//                ride.setAcceptedAt(LocalDateTime.now());
-//                break;
             case "ONGOING":
                 ride.setStartedAt(LocalDateTime.now());
                 break;
