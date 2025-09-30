@@ -237,4 +237,32 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("Register user phone exists should return 409")
+    void registerUser_phoneExists_shouldReturn409() throws Exception {
+        UserRequest request = new UserRequest();
+        request.setEmail("surya@example.com");
+        request.setPhone(PHONE);
+
+        Mockito.when(userService.registerUser(any(UserRequest.class)))
+                .thenThrow(new com.cabbooking.userservice.exception.PhoneAlreadyExistsException("Phone already exists"));
+
+        mockMvc.perform(post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("Generic exception should return 500")
+    void genericException_shouldReturn500() throws Exception {
+        Mockito.when(userService.getUserById(USER_ID))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        mockMvc.perform(get("/api/users/{id}", USER_ID))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Internal server error"));
+    }
+
+
 }

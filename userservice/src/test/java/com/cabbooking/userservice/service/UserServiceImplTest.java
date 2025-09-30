@@ -255,4 +255,42 @@ public class UserServiceImplTest {
         assertThrows(PhoneAlreadyExistsException.class, () -> userService.registerUser(request));
     }
 
+    // Java
+    @Test
+    @DisplayName("Register user throws EmailAlreadyExistsException if both email and phone exist")
+    void registerUser_bothEmailAndPhoneExist_throwsEmailException() {
+        UserRequest request = new UserRequest();
+        request.setEmail(EMAIL);
+        request.setPhone(PHONE);
+
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
+        when(userRepository.existsByPhone(request.getPhone())).thenReturn(true);
+
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.registerUser(request));
+    }
+
+
+    // Java
+    @Test
+    @DisplayName("Verify OTP throws UserNotFoundException if user not found")
+    void verifyOtp_userNotFound_throwsException() {
+        when(userRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.verifyOtp(USER_ID, "5678"));
+    }
+
+    // Java
+    @Test
+    @DisplayName("Forgot password throws UserNotFoundException if user not found")
+    void forgotPassword_userNotFound_throwsException() {
+        ForgotPassword forgotPassword = new ForgotPassword();
+        forgotPassword.setEmail("unknown@example.com");
+        forgotPassword.setNewPassword("newPassword");
+
+        when(userRepository.findByEmail(forgotPassword.getEmail())).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userService.forgotPassword(forgotPassword));
+    }
+
+
+
 }
