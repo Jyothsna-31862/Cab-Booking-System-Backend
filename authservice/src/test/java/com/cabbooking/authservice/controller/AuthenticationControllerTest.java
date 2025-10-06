@@ -2,8 +2,6 @@ package com.cabbooking.authservice.controller;
 
 import com.cabbooking.authservice.dto.*;
 import com.cabbooking.authservice.service.AuthenticationService;
-import com.cabbooking.authservice.security.JwtAuthenticationEntryPoint;
-import com.cabbooking.authservice.security.JwtAuthenticationFilter;
 import com.cabbooking.authservice.security.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -46,11 +44,6 @@ class AuthenticationControllerTest {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
-    @MockitoBean
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @MockitoBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     @DisplayName("POST /api/auth/login returns JWT response")
