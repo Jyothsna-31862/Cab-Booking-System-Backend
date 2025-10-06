@@ -38,6 +38,9 @@ public class ServiceAvailabilityFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
+        log.info("Entered ====> Service");
+
         if (!(request instanceof HttpServletRequest httpReq)) {
             chain.doFilter(request, response);
             return;
@@ -45,7 +48,7 @@ public class ServiceAvailabilityFilter implements Filter {
 
         String uri = httpReq.getRequestURI();
 
-        if (uri.startsWith("/fallback")) { // avoid recursion
+        if (uri.startsWith("/fallback")) {
             chain.doFilter(request, response);
             return;
         }
