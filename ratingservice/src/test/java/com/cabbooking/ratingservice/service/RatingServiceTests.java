@@ -24,8 +24,7 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-@TestMethodOrder(MethodOrderer.DisplayName.class)
-class RatingServiceTests {
+public class RatingServiceTests {
 
     @Mock
     private RatingRepository ratingRepository;

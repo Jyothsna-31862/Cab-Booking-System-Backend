@@ -40,7 +40,6 @@ public class AuthValidationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        log.info("Entered ====> auth");// First Call
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
@@ -52,7 +51,7 @@ public class AuthValidationFilter implements Filter {
                 log.debug("Incoming request method={} path={}", method, requestPath);
             }
 
-            if ("OPTIONS".equalsIgnoreCase(method) || isPublicUrl(requestPath)) {
+            if (isPublicUrl(requestPath)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Skipping auth for public/OPTIONS path={}", requestPath);
                 }

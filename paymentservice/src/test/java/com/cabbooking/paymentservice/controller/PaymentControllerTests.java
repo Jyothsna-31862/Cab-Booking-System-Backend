@@ -27,8 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @WebMvcTest(PaymentController.class)
-@ExtendWith(MockitoExtension.class)
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 public class PaymentControllerTests {
 
     @Autowired

@@ -59,6 +59,5 @@ public class Driver {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
-    private Timestamp deletedAt;
 
 }

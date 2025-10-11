@@ -14,7 +14,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +52,6 @@ public class RideControllerTest {
         testRideDto.setDropLocation("Location B");
         testRideDto.setBookingDate("2025-09-23");
         testRideDto.setBookingTime("10:00");
-        testRideDto.setRequestedAt(LocalDateTime.now());
         testRideDto.setImmediateBooking(true);
         testRideDto.setFare(BigDecimal.valueOf(25.50));
         testRideDto.setDistance(BigDecimal.valueOf(10.5));

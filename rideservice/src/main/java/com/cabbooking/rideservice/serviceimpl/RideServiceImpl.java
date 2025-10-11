@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +47,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public ArrayList<RideDto> getDriverRidesByStatus(String driverId, String status) {
-        ArrayList<Ride> rides = rideRepository.findAllByDriverIdAndStatus(driverId, status.toUpperCase());
+        List<Ride> rides = rideRepository.findAllByDriverIdAndStatus(driverId, status.toUpperCase());
         return rides.stream()
                 .map(ride -> modelMapper.map(ride, RideDto.class))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -54,7 +55,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public ArrayList<RideDto> getUserRidesByStatus(String userId, String status) {
-        ArrayList<Ride> rides = rideRepository.findAllByUserIdAndStatus(userId, status.toUpperCase());
+        List<Ride> rides = rideRepository.findAllByUserIdAndStatus(userId, status.toUpperCase());
         return rides.stream()
                 .map(ride -> modelMapper.map(ride, RideDto.class))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -62,7 +63,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public ArrayList<RideDto> getAllUserRides(String userId) {
-        ArrayList<Ride> rides = rideRepository.findAllByUserIdOrderByBookingDateDescBookingTimeDesc(userId);
+        List<Ride> rides = rideRepository.findAllByUserIdOrderByBookingDateDescBookingTimeDesc(userId);
         return rides.stream()
                 .map(ride -> modelMapper.map(ride, RideDto.class))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -70,7 +71,7 @@ public class RideServiceImpl implements RideService {
 
     @Override
     public ArrayList<RideDto> getAllDriverRides(String driverId) {
-        ArrayList<Ride> rides = rideRepository.findAllByDriverIdOrderByBookingDateDescBookingTimeDesc(driverId);
+        List<Ride> rides = rideRepository.findAllByDriverIdOrderByBookingDateDescBookingTimeDesc(driverId);
         return rides.stream()
                 .map(ride -> modelMapper.map(ride,RideDto.class))
                 .collect(Collectors.toCollection(ArrayList::new));

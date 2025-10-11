@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-@TestMethodOrder(MethodOrderer.DisplayName.class)
 public class PaymentServiceTests {
 
     @Mock

@@ -28,7 +28,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final MapperConfig mapperConfig;
-//    private final static String SUCCESS="success"; String
 
     @Override
     public UserServiceResponse registerUser(UserRequest userRequest) {

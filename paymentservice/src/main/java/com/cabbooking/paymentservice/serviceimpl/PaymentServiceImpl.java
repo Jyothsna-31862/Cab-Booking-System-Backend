@@ -12,6 +12,7 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -23,16 +24,12 @@ import com.cabbooking.paymentservice.service.PaymentService;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
 	private final PaymentRepository paymentRepository;
 
 	private final ModelMapper modelMapper;
-
-	public PaymentServiceImpl(PaymentRepository paymentRepository, ModelMapper modelMapper) {
-		this.paymentRepository = paymentRepository;
-		this.modelMapper = modelMapper;
-	}
 
 	@Override
 	public PaymentDto createPayment(PaymentDto paymentDto) {

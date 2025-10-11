@@ -27,14 +27,6 @@ public class RideDto {
 
     private String bookingTime;
 
-    private LocalDateTime requestedAt;
-
-    private LocalDateTime assignedAt;
-
-    private LocalDateTime startedAt;
-
-    private LocalDateTime completedAt;
-
     private boolean immediateBooking;
 
     private BigDecimal fare;

@@ -4,6 +4,7 @@ import com.cabbooking.locationservice.model.Location;
 import com.cabbooking.locationservice.repository.LocationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +15,12 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LocationLoaderService {
 
     private final LocationRepository locationRepository;
     private final ObjectMapper objectMapper;
 
-    public LocationLoaderService(LocationRepository locationRepository) {
-        this.locationRepository = locationRepository;
-        this.objectMapper = new ObjectMapper();
-    }
 
     @PostConstruct
     public void loadLocationsFromJson() {

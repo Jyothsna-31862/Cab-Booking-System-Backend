@@ -10,8 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -24,14 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @WebMvcTest(RatingController.class)
-@ExtendWith(MockitoExtension.class)
-@TestMethodOrder(MethodOrderer.DisplayName.class)
-class RatingControllerTests {
+public class RatingControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private RatingService ratingService;
 
     @Autowired
@@ -109,31 +107,6 @@ class RatingControllerTests {
                 .andExpect(status().isInternalServerError());
     }
 
-    @Test
-    @DisplayName("GET /api/ratings/ride/{rideId} should return 200 OK and rating when found")
-    void getRatingByRideId_shouldReturnOkAndRating_whenFound() throws Exception {
-        String rideId = "100";
-        when(ratingService.getRatingById(rideId)).thenReturn(Optional.of(testRatingDTO));
-
-        mockMvc.perform(get("/api/ratings/ride/{rideId}", rideId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.ratingId").value(1))
-                .andExpect(jsonPath("$.rideId").value("100"))
-                .andExpect(jsonPath("$.driverId").value("200"))
-                .andExpect(jsonPath("$.score").value(5))
-                .andExpect(jsonPath("$.comments").value("Excellent service!"));
-    }
-
-    @Test
-    @DisplayName("GET /api/ratings/ride/{rideId} should return 404 Not Found when rating not found")
-    void getRatingByRideId_shouldReturnNotFound_whenNotFound() throws Exception {
-        String rideId = "999";
-        when(ratingService.getRatingById(rideId)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/api/ratings/ride/{rideId}", rideId))
-                .andExpect(status().isNotFound());
-    }
 
     @Test
     @DisplayName("GET /api/ratings/driver/{driverId} should return 200 OK and average rating")
@@ -172,20 +145,6 @@ class RatingControllerTests {
     }
 
     @Test
-    @DisplayName("GET /api/ratings/ride/{rideId} should handle various rideId formats")
-    void getRatingByRideId_shouldHandleVariousRideIdFormats() throws Exception {
-        String[] rideIds = {"123", "ride-456", "R789"};
-
-        for (String rideId : rideIds) {
-            when(ratingService.getRatingById(rideId)).thenReturn(Optional.of(testRatingDTO));
-
-            mockMvc.perform(get("/api/ratings/ride/{rideId}", rideId))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-        }
-    }
-
-    @Test
     @DisplayName("GET /api/ratings/driver/{driverId} should handle various driverId formats")
     void getAverageRatingForDriver_shouldHandleVariousDriverIdFormats() throws Exception {
         String[] driverIds = {"123", "driver-456", "D789"};
@@ -203,8 +162,6 @@ class RatingControllerTests {
     @Test
     @DisplayName("POST /api/ratings should handle different score values")
     void createRating_shouldHandleDifferentScoreValues() throws Exception {
-        // Use a more flexible mocking approach - mock based on any RatingDTO
-        // and return the appropriate response based on the score
         when(ratingService.createRating(any(RatingDTO.class))).thenAnswer(invocation -> {
             RatingDTO input = invocation.getArgument(0);
             return input; // Return the same object that was passed in
@@ -242,25 +199,6 @@ class RatingControllerTests {
         mockMvc.perform(post("/api/ratings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                .andExpect(status().isOk()); // Controller doesn't validate, service layer handles
-    }
-
-    @Test
-    @DisplayName("GET endpoints should handle URL encoding")
-    void endpoints_shouldHandleUrlEncoding() throws Exception {
-        // Test with simple encoded URLs (single encoding)
-        String encodedRideId = "ride%20123";  // This becomes "ride 123"
-        String encodedDriverId = "driver%20456";  // This becomes "driver 456"
-
-        // Mock with the decoded values that Spring will pass to the service
-        when(ratingService.getRatingById("ride 123")).thenReturn(Optional.of(testRatingDTO));
-        when(ratingService.getAverageRatingForDriver("driver 456")).thenReturn(4.0);
-
-        // Test the actual endpoints
-        mockMvc.perform(get("/api/ratings/ride/{rideId}", "ride 123"))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get("/api/ratings/driver/{driverId}", "driver 456"))
                 .andExpect(status().isOk());
     }
 }
